@@ -1,0 +1,164 @@
+{%- comment -%}
+  Wander Way demo - Delivery estimate on the product page
+  - Shipping zone picker (pre-selected from the visitor's localization country)
+  - Delivery window in business days, with an order cut-off countdown
+  - Free-shipping progress based on the selected variant's price
+    (updates on Dawn's PUB_SUB_EVENTS.variantChange)
+  All rates and days are edited in the theme editor as zone blocks.
+{%- endcomment -%}
+
+{{ 'ww-delivery-estimate.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign visitor_country = localization.country.iso_code | downcase
+  assign threshold_cents = section.settings.free_shipping_threshold | times: 100
+-%}
+
+{%- if section.blocks.size > 0 -%}
+  <div class="color-{{ section.settings.color_scheme }} gradient">
+    <ww-delivery-estimate
+      class="ww-delivery page-width"
+      data-threshold="{{ threshold_cents }}"
+      data-price="{{ current_variant.price | default: product.price }}"
+      data-cutoff-hour="{{ section.settings.cutoff_hour }}"
+      data-processing-days="{{ section.settings.processing_days }}"
+      data-locale="{{ request.locale.iso_code }}"
+      data-money-format="{{ shop.money_format | escape }}"
+      style="--ww-pad-top: {{ section.settings.padding_top }}px; --ww-pad-bottom: {{ section.settings.padding_bottom }}px;"
+    >
+      <div class="ww-delivery__card">
+        <div class="ww-delivery__head">
+          <svg class="ww-delivery__icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="24" height="24">
+            <path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" d="M2 6h11v9H2zM13 9h4l4 3.5V15h-8zM6 18.5a1.5 1.5 0 1 0 0-.01M17 18.5a1.5 1.5 0 1 0 0-.01"/>
+          </svg>
+          <h2 class="ww-delivery__title h4">{{ section.settings.heading | escape }}</h2>
+        </div>
+
+        <label class="ww-delivery__label" for="WWZone-{{ section.id }}">{{ section.settings.zone_label | escape }}</label>
+        <div class="select">
+          <select id="WWZone-{{ section.id }}" class="select__select ww-delivery__select">
+            {%- assign selected_done = false -%}
+            {%- for block in section.blocks -%}
+              {%- liquid
+                assign codes = block.settings.countries | downcase | remove: ' ' | split: ','
+                assign is_selected = false
+                if selected_done == false and codes contains visitor_country
+                  assign is_selected = true
+                  assign selected_done = true
+                endif
+              -%}
+              <option
+                value="{{ forloop.index0 }}"
+                data-rate="{{ block.settings.rate | times: 100 }}"
+                data-min="{{ block.settings.min_days }}"
+                data-max="{{ block.settings.max_days }}"
+                {% if is_selected %}selected{% endif %}
+                {{ block.shopify_attributes }}
+              >
+                {{- block.settings.zone_name | escape -}}
+              </option>
+            {%- endfor -%}
+          </select>
+          <svg aria-hidden="true" focusable="false" class="icon icon-caret" viewBox="0 0 10 6"><path fill="currentColor" fill-rule="evenodd" d="M9.354.646a.5.5 0 0 0-.708 0L5 4.293 1.354.646a.5.5 0 0 0-.708.708l4 4a.5.5 0 0 0 .708 0l4-4a.5.5 0 0 0 0-.708" clip-rule="evenodd"/></svg>
+        </div>
+
+        <ul class="ww-delivery__rows" role="list">
+          <li>
+            <span>{{ section.settings.arrives_label | escape }}</span>
+            <strong data-ww-window>&ndash;</strong>
+          </li>
+          <li>
+            <span>{{ section.settings.shipping_label | escape }}</span>
+            <strong data-ww-rate>&ndash;</strong>
+          </li>
+        </ul>
+
+        <p class="ww-delivery__cutoff" data-ww-cutoff hidden></p>
+
+        {%- if threshold_cents > 0 -%}
+          <div class="ww-delivery__free">
+            <p class="ww-delivery__free-text" data-ww-free-text aria-live="polite"></p>
+            <div
+              class="ww-delivery__bar"
+              role="progressbar"
+              aria-label="{{ section.settings.free_label | escape }}"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+              data-ww-bar
+            >
+              <span data-ww-bar-fill></span>
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    </ww-delivery-estimate>
+  </div>
+
+  <script src="{{ 'ww-delivery-estimate.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "WW: Delivery estimate",
+  "tag": "section",
+  "class": "section",
+  "enabled_on": { "templates": ["product"] },
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Delivery & shipping" },
+    { "type": "text", "id": "zone_label", "label": "Zone label", "default": "Ship to" },
+    { "type": "text", "id": "arrives_label", "label": "Arrival label", "default": "Estimated arrival" },
+    { "type": "text", "id": "shipping_label", "label": "Shipping label", "default": "Shipping" },
+    { "type": "text", "id": "free_label", "label": "Free shipping label", "default": "Free shipping progress" },
+    {
+      "type": "number",
+      "id": "free_shipping_threshold",
+      "label": "Free shipping from (store currency, 0 = off)",
+      "default": 80
+    },
+    { "type": "range", "id": "processing_days", "min": 0, "max": 5, "step": 1, "label": "Processing days before dispatch", "default": 1 },
+    {
+      "type": "range",
+      "id": "cutoff_hour",
+      "min": 0,
+      "max": 23,
+      "step": 1,
+      "label": "Same-day dispatch cut-off (hour, visitor time)",
+      "default": 14
+    },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "range", "id": "padding_top", "min": 0, "max": 80, "step": 4, "unit": "px", "label": "Top padding", "default": 12 },
+    { "type": "range", "id": "padding_bottom", "min": 0, "max": 80, "step": 4, "unit": "px", "label": "Bottom padding", "default": 24 }
+  ],
+  "blocks": [
+    {
+      "type": "zone",
+      "name": "Shipping zone",
+      "settings": [
+        { "type": "text", "id": "zone_name", "label": "Zone name", "default": "Europe" },
+        {
+          "type": "text",
+          "id": "countries",
+          "label": "Country codes (ISO, comma-separated)",
+          "info": "Used to pre-select the zone from the visitor's country, e.g. DE,AT,CH",
+          "default": "DE,AT,CH,NL,BE,FR,IT,ES,DK,SE"
+        },
+        { "type": "number", "id": "rate", "label": "Rate (store currency)", "default": 6 },
+        { "type": "range", "id": "min_days", "min": 1, "max": 20, "step": 1, "label": "Transit days (min)", "default": 2 },
+        { "type": "range", "id": "max_days", "min": 1, "max": 30, "step": 1, "label": "Transit days (max)", "default": 4 }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "WW: Delivery estimate",
+      "blocks": [
+        { "type": "zone", "settings": { "zone_name": "Europe", "countries": "DE,AT,CH,NL,BE,FR,IT,ES,DK,SE,RS", "rate": 6, "min_days": 2, "max_days": 4 } },
+        { "type": "zone", "settings": { "zone_name": "United Kingdom", "countries": "GB", "rate": 9, "min_days": 3, "max_days": 6 } },
+        { "type": "zone", "settings": { "zone_name": "Rest of world", "countries": "", "rate": 15, "min_days": 6, "max_days": 12 } }
+      ]
+    }
+  ]
+}
+{% endschema %}
