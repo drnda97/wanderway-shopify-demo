@@ -604,80 +604,9 @@ product-info .product__pickup-availabilities {
   color: var(--ww-ink-3);
 }
 
-.ww-cutoff {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14.5px;
-  line-height: 1.6;
-  color: var(--ww-ink);
-}
-
-.ww-cutoff[hidden] {
-  display: none;
-}
-
-.ww-cutoff .ww-icon {
-  color: var(--ww-accent);
-}
-
-.ww-cutoff strong {
-  font-weight: 600;
-}
-
 .ww-estimate__free {
   padding-top: 16px;
   border-top: 1px solid var(--ww-border-soft);
-}
-
-/* Free-shipping progress (shared with the cart drawer) */
-.ww-free-shipping {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.ww-free-shipping__row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--ww-ink);
-}
-
-.ww-free-shipping__text strong {
-  font-weight: 600;
-}
-
-.ww-free-shipping.is-unlocked .ww-free-shipping__text {
-  font-weight: 600;
-  color: var(--ww-success);
-}
-
-.ww-free-shipping__amount {
-  color: var(--ww-ink-3);
-  white-space: nowrap;
-}
-
-.ww-free-shipping__bar {
-  height: 8px;
-  border-radius: var(--ww-radius-pill);
-  background: var(--ww-border-soft);
-  overflow: hidden;
-}
-
-.ww-free-shipping__bar span {
-  display: block;
-  height: 100%;
-  border-radius: var(--ww-radius-pill);
-  background: var(--ww-accent);
-  transition: width var(--ww-dur-ui) var(--ww-ease);
-}
-
-.ww-free-shipping.is-unlocked .ww-free-shipping__bar span {
-  background: var(--ww-success-dot);
 }
 
 /* ---- Accordions --------------------------------------------------------- */

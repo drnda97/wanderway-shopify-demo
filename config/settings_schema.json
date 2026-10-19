@@ -1517,6 +1517,58 @@
         "default": "Unlocks free shipping"
       },
       {
+        "type": "text",
+        "id": "ww_cart_upsell_button",
+        "label": "Upsell button",
+        "default": "Add"
+      },
+      {
+        "type": "header",
+        "content": "Cart drawer"
+      },
+      {
+        "type": "text",
+        "id": "ww_cart_remove_label",
+        "label": "Remove link",
+        "default": "Remove"
+      },
+      {
+        "type": "text",
+        "id": "ww_cart_shipping_label",
+        "label": "Shipping row label",
+        "default": "Shipping"
+      },
+      {
+        "type": "text",
+        "id": "ww_cart_free_label",
+        "label": "Free shipping value",
+        "default": "Free"
+      },
+      {
+        "type": "text",
+        "id": "ww_cart_subtotal_label",
+        "label": "Subtotal label",
+        "default": "Subtotal"
+      },
+      {
+        "type": "text",
+        "id": "ww_cart_tax_note",
+        "label": "Tax note",
+        "default": "Taxes included. Discount codes at checkout."
+      },
+      {
+        "type": "text",
+        "id": "ww_cart_checkout_label",
+        "label": "Checkout button",
+        "default": "Checkout"
+      },
+      {
+        "type": "text",
+        "id": "ww_cart_demo_note",
+        "label": "Note under the button",
+        "default": "Demo store – checkout is disabled"
+      },
+      {
         "type": "header",
         "content": "Dispatch"
       },

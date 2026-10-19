@@ -1,0 +1,309 @@
+{%- comment -%}
+  Wander Way demo – cart drawer (replaces Dawn's cart-drawer snippet).
+  Same contract as Dawn's markup, so cart-drawer.js and cart.js work
+  unchanged: <cart-drawer>, #CartDrawer, .drawer__inner (re-rendered after
+  every change), #CartDrawer-Item-n, #Drawer-quantity-n, cart-remove-button,
+  #CartDrawer-LineItemError-n, live regions and #CartDrawer-Checkout.
+  Added: free-shipping strip + dispatch countdown, colour dots, upsell row
+  (adds via /cart/add.js, then Dawn's renderContents), shipping estimate.
+
+  Usage:
+  {% render 'ww-cart-drawer' %}
+{%- endcomment -%}
+{{ 'quantity-popover.css' | asset_url | stylesheet_tag }}
+{{ 'ww-cart-drawer.css' | asset_url | stylesheet_tag }}
+
+<script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'quantity-popover.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'ww-shipping.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'ww-cart.js' | asset_url }}" defer="defer"></script>
+
+<style>
+  .drawer {
+    visibility: hidden;
+  }
+</style>
+
+{%- liquid
+  assign threshold = settings.ww_free_shipping_threshold | times: 100
+  assign unlocked = false
+  if threshold > 0 and cart.total_price >= threshold
+    assign unlocked = true
+  endif
+
+  assign upsell = settings.ww_cart_upsell | default: all_products['tech-organiser']
+  assign show_upsell = false
+  if upsell.id != blank and upsell.available and unlocked == false and threshold > 0 and cart != empty
+    assign show_upsell = true
+    for item in cart.items
+      if item.product_id == upsell.id
+        assign show_upsell = false
+        break
+      endif
+    endfor
+  endif
+
+  assign cart_title_words = 'sections.cart.title' | t | split: ' '
+  assign cart_title_last = cart_title_words | last
+  assign cart_title_lead = 'sections.cart.title' | t | remove_last: cart_title_last | strip
+-%}
+
+<cart-drawer class="drawer ww-cart-drawer{% if cart == empty %} is-empty{% endif %}">
+  <div id="CartDrawer" class="cart-drawer">
+    <div id="CartDrawer-Overlay" class="cart-drawer__overlay"></div>
+    <div
+      class="drawer__inner ww-scope"
+      role="dialog"
+      aria-modal="true"
+      aria-label="{{ 'sections.cart.title' | t }}"
+      tabindex="-1"
+    >
+      {%- if cart == empty -%}
+        <div class="drawer__inner-empty">
+          <div class="cart-drawer__warnings">
+            <div class="cart-drawer__empty-content">
+              <h2 class="cart__empty-text">{{ 'sections.cart.empty' | t }}</h2>
+              <button
+                class="drawer__close ww-cart__close"
+                type="button"
+                onclick="this.closest('cart-drawer').close()"
+                aria-label="{{ 'accessibility.close' | t }}"
+              >
+                {%- render 'ww-icon', icon: 'close', size: 18, stroke: 1.8 -%}
+              </button>
+              <a href="{{ routes.all_products_collection_url }}" class="ww-btn ww-btn--primary">
+                {{- 'general.continue_shopping' | t -}}
+              </a>
+            </div>
+          </div>
+        </div>
+      {%- endif -%}
+
+      <div class="drawer__header ww-cart__header">
+        <div class="ww-cart__heading-row">
+          <h2 class="drawer__heading ww-cart__heading">
+            {{- cart_title_lead }}
+            <em>{{ cart_title_last }}</em>
+          </h2>
+          <span class="ww-cart__count">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+        </div>
+        <button
+          class="drawer__close ww-cart__close"
+          type="button"
+          onclick="this.closest('cart-drawer').close()"
+          aria-label="{{ 'accessibility.close' | t }}"
+        >
+          {%- render 'ww-icon', icon: 'close', size: 18, stroke: 1.8 -%}
+        </button>
+      </div>
+
+      {%- if threshold > 0 and cart != empty -%}
+        <div class="ww-cart__strip">
+          {%- render 'ww-free-shipping' -%}
+          {%- render 'ww-cutoff', class: 'ww-cart__cutoff ww-cart__cutoff--strip', icon_size: 15 -%}
+        </div>
+      {%- endif -%}
+
+      <cart-drawer-items
+        view-event-payload="{{ cart | standard_event_data: 'view', context: 'dialog' | escape }}"
+        view-event-trigger="manual"
+        {% if cart == empty %}
+          class=" is-empty"
+        {% endif %}
+      >
+        <form action="{{ routes.cart_url }}" id="CartDrawer-Form" class="cart__contents cart-drawer__form" method="post">
+          <div id="CartDrawer-CartItems" class="drawer__contents js-contents">
+            {%- if cart != empty -%}
+              <ul class="ww-cart__items" role="list">
+                {%- for item in cart.items -%}
+                  {%- liquid
+                    assign line = item.index | plus: 1
+                    assign colour = ''
+                    for option in item.options_with_values
+                      assign option_name = option.name | downcase
+                      if option_name == 'color' or option_name == 'colour'
+                        assign colour = option.value
+                      endif
+                    endfor
+                    assign colour_handle = colour | handleize
+                  -%}
+                  <li id="CartDrawer-Item-{{ line }}" class="cart-item ww-cart-item">
+                    <a href="{{ item.url }}" class="ww-cart-item__media" tabindex="-1" aria-hidden="true">
+                      {%- if item.image -%}
+                        {{
+                          item.image
+                          | image_url: width: 240
+                          | image_tag: width: 96, height: 116, alt: '', loading: 'lazy', class: 'ww-cart-item__img'
+                        }}
+                      {%- endif -%}
+                    </a>
+                    <div class="ww-cart-item__details">
+                      <div class="ww-cart-item__top">
+                        <a href="{{ item.url }}" class="cart-item__name ww-cart-item__name">{{ item.product.title | escape }}</a>
+                        <span class="ww-cart-item__total">
+                          {%- render 'loading-spinner' -%}
+                          {%- if item.original_line_price != item.final_line_price -%}
+                            <s class="ww-cart-item__old">{{ item.original_line_price | money_without_trailing_zeros }}</s>
+                          {%- endif -%}
+                          {{ item.final_line_price | money_without_trailing_zeros }}
+                        </span>
+                      </div>
+                      <p class="ww-cart-item__meta">
+                        {%- if colour != blank -%}
+                          <span class="ww-dot" style="--ww-dot: var(--ww-swatch-{{ colour_handle }}, var(--ww-border-strong));" aria-hidden="true"></span>
+                          {{ colour | escape }}
+                        {%- elsif item.product.has_only_default_variant == false -%}
+                          {{ item.variant.title | escape }}
+                        {%- endif -%}
+                        <span class="ww-cart-item__unit"> · {{ item.final_price | money_without_trailing_zeros }}</span>
+                      </p>
+                      {%- for property in item.properties -%}
+                        {%- assign property_first_char = property.first | slice: 0 -%}
+                        {%- if property.last != blank and property_first_char != '_' -%}
+                          <p class="ww-cart-item__meta">{{ property.first | escape }}: {{ property.last | escape }}</p>
+                        {%- endif -%}
+                      {%- endfor -%}
+                      <div class="ww-cart-item__actions">
+                        <quantity-input class="quantity cart-quantity ww-cart-item__qty">
+                          <button
+                            class="quantity__button"
+                            name="minus"
+                            type="button"
+                            {% if item.instructions and item.instructions.can_update_quantity == false %}
+                              disabled
+                            {% endif %}
+                          >
+                            <span class="visually-hidden">
+                              {{- 'products.product.quantity.decrease' | t: product: item.product.title | escape -}}
+                            </span>
+                            <span aria-hidden="true">−</span>
+                          </button>
+                          <input
+                            class="quantity__input"
+                            type="number"
+                            data-quantity-variant-id="{{ item.variant.id }}"
+                            data-quantity-line-key="{{ item.key }}"
+                            name="updates[]"
+                            value="{{ item.quantity }}"
+                            {% # theme-check-disable %}
+                            data-cart-quantity="{{ cart | item_count_for_variant: item.variant.id }}"
+                            min="0"
+                            data-min="{{ item.variant.quantity_rule.min }}"
+                            {% if item.variant.quantity_rule.max != null %}
+                              max="{{ item.variant.quantity_rule.max }}"
+                            {% endif %}
+                            step="{{ item.variant.quantity_rule.increment }}"
+                            {% # theme-check-enable %}
+                            aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
+                            id="Drawer-quantity-{{ line }}"
+                            data-index="{{ line }}"
+                            {% if item.instructions and item.instructions.can_update_quantity == false %}
+                              disabled
+                            {% endif %}
+                          >
+                          <button
+                            class="quantity__button"
+                            name="plus"
+                            type="button"
+                            {% if item.instructions and item.instructions.can_update_quantity == false %}
+                              disabled
+                            {% endif %}
+                          >
+                            <span class="visually-hidden">
+                              {{- 'products.product.quantity.increase' | t: product: item.product.title | escape -}}
+                            </span>
+                            <span aria-hidden="true">+</span>
+                          </button>
+                        </quantity-input>
+                        <cart-remove-button id="CartDrawer-Remove-{{ line }}" data-index="{{ line }}">
+                          <button
+                            type="button"
+                            class="ww-cart-item__remove{% if item.instructions and item.instructions.can_remove == false %} hidden{% endif %}"
+                            aria-label="{{ 'sections.cart.remove_title' | t: title: item.title | escape }}"
+                            data-variant-id="{{ item.variant.id }}"
+                          >
+                            {{- settings.ww_cart_remove_label | escape -}}
+                          </button>
+                        </cart-remove-button>
+                      </div>
+                      <div id="CartDrawer-LineItemError-{{ line }}" class="cart-item__error ww-cart-item__error" role="alert">
+                        <small class="cart-item__error-text"></small>
+                      </div>
+                    </div>
+                  </li>
+                {%- endfor -%}
+              </ul>
+
+              {%- if show_upsell -%}
+                {%- assign upsell_variant = upsell.selected_or_first_available_variant -%}
+                <ww-cart-upsell class="ww-cart__upsell" data-variant-id="{{ upsell_variant.id }}">
+                  {%- assign upsell_image = upsell_variant.featured_image | default: upsell.featured_image -%}
+                  {%- if upsell_image -%}
+                    {{ upsell_image | image_url: width: 120 | image_tag: width: 56, height: 56, alt: '', loading: 'lazy', class: 'ww-cart__upsell-img' }}
+                  {%- endif -%}
+                  <span class="ww-cart__upsell-text">
+                    <span class="ww-cart__upsell-label">{{ settings.ww_cart_upsell_label | escape }}</span>
+                    <span class="ww-cart__upsell-name">
+                      {{- upsell.title | escape }} · {{ upsell_variant.price | money_without_trailing_zeros -}}
+                    </span>
+                  </span>
+                  <button type="button" class="ww-cart__upsell-button" aria-label="{{ settings.ww_cart_upsell_button | escape }} {{ upsell.title | escape }}">
+                    {{- settings.ww_cart_upsell_button | escape -}}
+                  </button>
+                </ww-cart-upsell>
+              {%- endif -%}
+            {%- endif -%}
+            <p id="CartDrawer-LiveRegionText" class="visually-hidden" role="status"></p>
+            <p id="CartDrawer-LineItemStatus" class="visually-hidden" aria-hidden="true" role="status">
+              {{ 'accessibility.loading' | t }}
+            </p>
+          </div>
+          <div id="CartDrawer-CartErrors" role="alert"></div>
+        </form>
+      </cart-drawer-items>
+
+      <div class="drawer__footer ww-cart__footer">
+        <ww-cart-shipping
+          class="ww-cart__shipping"
+          data-zones="{{ settings.ww_shipping_zones | escape }}"
+          data-free="{{ unlocked }}"
+          data-free-label="{{ settings.ww_cart_free_label | escape }}"
+          data-subtotal="{{ cart.total_price }}"
+          data-money-format="{{ shop.money_format | strip_html | escape }}"
+        >
+          <span>{{ settings.ww_cart_shipping_label | escape }}</span>
+          <span data-ww-shipping-value>
+            {%- if unlocked -%}{{ settings.ww_cart_free_label | escape }}{%- endif -%}
+          </span>
+        </ww-cart-shipping>
+        <div class="ww-cart__subtotal" role="status">
+          <span class="ww-cart__subtotal-label">{{ settings.ww_cart_subtotal_label | escape }}</span>
+          <span class="ww-cart__subtotal-value">{{ cart.total_price | money_without_trailing_zeros }}</span>
+        </div>
+        {%- if settings.ww_cart_tax_note != blank -%}
+          <p class="ww-cart__tax">{{ settings.ww_cart_tax_note | escape }}</p>
+        {%- endif -%}
+        {%- if threshold > 0 and cart != empty -%}
+          {%- render 'ww-cutoff', class: 'ww-cart__cutoff ww-cart__cutoff--footer', icon_size: 14 -%}
+        {%- endif -%}
+        <button
+          type="submit"
+          id="CartDrawer-Checkout"
+          class="ww-btn ww-btn--primary ww-btn--lg ww-cart__checkout"
+          name="checkout"
+          form="CartDrawer-Form"
+          {% if cart == empty %}
+            disabled
+          {% endif %}
+        >
+          {{- settings.ww_cart_checkout_label | escape }} ·
+          <span class="ww-cart__checkout-total" data-ww-checkout-total>{{ cart.total_price | money_without_trailing_zeros }}</span>
+          <span class="ww-cart__checkout-subtotal">{{ cart.total_price | money_without_trailing_zeros }}</span>
+        </button>
+        {%- if settings.ww_cart_demo_note != blank -%}
+          <p class="ww-cart__demo-note">{{ settings.ww_cart_demo_note | escape }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</cart-drawer>
