@@ -45,6 +45,7 @@
 
   assign current_variant = p.selected_or_first_available_variant
   if colour_option
+    assign colour_index = colour_option.position | minus: 1
     assign wanted = colour | default: '' | downcase
     if wanted == blank
       assign featured_alt = p.featured_image.alt | downcase
@@ -58,14 +59,14 @@
     endif
     if wanted != blank
       for variant in p.variants
-        assign variant_value = variant.options[colour_option.position | minus: 1] | downcase
+        assign variant_value = variant.options[colour_index] | downcase
         if variant_value == wanted
           assign current_variant = variant
           break
         endif
       endfor
     endif
-    assign current_colour = current_variant.options[colour_option.position | minus: 1]
+    assign current_colour = current_variant.options[colour_index]
   endif
 
   assign image = current_variant.featured_image | default: p.featured_image
@@ -173,7 +174,7 @@
         {%- liquid
           assign value_variant = null
           for variant in p.variants
-            if variant.options[colour_option.position | minus: 1] == value
+            if variant.options[colour_index] == value
               assign value_variant = variant
               break
             endif

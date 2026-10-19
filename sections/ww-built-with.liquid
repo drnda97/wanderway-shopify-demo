@@ -1,0 +1,81 @@
+{%- comment -%}
+  Wander Way demo – "Built with" strip: intro cell + one cell per tool block.
+{%- endcomment -%}
+{{ 'ww-home.css' | asset_url | stylesheet_tag }}
+
+{%- assign s = section.settings -%}
+<section class="ww-built ww-section ww-scope page-width" aria-label="{{ s.eyebrow | escape }}">
+  <div class="ww-built__card">
+    <div class="ww-built__intro">
+      {%- if s.eyebrow != blank -%}
+        <p class="ww-eyebrow">{{ s.eyebrow | escape }}</p>
+      {%- endif -%}
+      <p class="ww-built__lead">
+        {{- s.heading | escape }}
+        {% if s.heading_italic != blank %}<em>{{ s.heading_italic | escape }}</em>{% endif -%}
+      </p>
+    </div>
+    <ul class="ww-built__items" role="list">
+      {%- for block in section.blocks -%}
+        <li class="ww-built__item" {{ block.shopify_attributes }}>
+          {%- render 'ww-icon', icon: block.settings.icon, size: 28, stroke: 1.5, class: 'ww-built__icon' -%}
+          <div>
+            <p class="ww-built__name">{{ block.settings.name | escape }}</p>
+            <p class="ww-built__caption">
+              <span class="ww-built__desktop-copy">{{ block.settings.caption | escape }}</span>
+              <span class="ww-built__mobile-copy">{{ block.settings.caption_mobile | default: block.settings.caption | escape }}</span>
+            </p>
+          </div>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "WW: Built with",
+  "tag": "div",
+  "class": "section-ww-built",
+  "max_blocks": 4,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Built with" },
+    { "type": "text", "id": "heading", "label": "Text", "default": "A custom Dawn theme," },
+    { "type": "text", "id": "heading_italic", "label": "Italic part", "default": "no page builders." }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Tool",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "drop", "label": "Drop" },
+            { "value": "code", "label": "Code" },
+            { "value": "terminal", "label": "Terminal" },
+            { "value": "check-circle", "label": "Check" }
+          ],
+          "default": "code"
+        },
+        { "type": "text", "id": "name", "label": "Name", "default": "Liquid" },
+        { "type": "text", "id": "caption", "label": "Caption", "default": "Sections & blocks" },
+        { "type": "text", "id": "caption_mobile", "label": "Caption on mobile", "info": "Optional shorter version." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "WW: Built with",
+      "blocks": [
+        { "type": "item", "settings": { "icon": "drop", "name": "Liquid", "caption": "Sections & blocks" } },
+        { "type": "item", "settings": { "icon": "code", "name": "JavaScript", "caption": "Vanilla web components" } },
+        { "type": "item", "settings": { "icon": "terminal", "name": "Shopify CLI", "caption": "Local dev & deploys" } },
+        { "type": "item", "settings": { "icon": "check-circle", "name": "Theme Check", "caption": "Linted, zero offences" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

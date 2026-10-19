@@ -1,0 +1,74 @@
+{%- comment -%}
+  Wander Way demo – responsive image with a bundled fallback.
+  Uses the image setting when set (image_url + image_tag, srcset); otherwise
+  the bundled photo from assets/ so the store looks right with zero setup.
+
+  Accepts:
+  - image: {Object} image or image_picker value (optional)
+  - fallback: {String} asset file name, e.g. 'weekender-sand.jpg' (required)
+  - alt: {String} alt text (image alt wins when set)
+  - sizes: {String} sizes attribute (default 100vw)
+  - widths: {String} srcset widths (default '400, 600, 800, 1000, 1200, 1400')
+  - eager: {Boolean} load eagerly with high priority (above the fold)
+  - class: {String} class attribute
+
+  Usage:
+  {% render 'ww-image', image: section.settings.image, fallback: 'weekender-sand.jpg', alt: 'Weekender', sizes: '50vw', eager: true %}
+{%- endcomment -%}
+{%- liquid
+  assign sizes = sizes | default: '100vw'
+  assign widths = widths | default: '400, 600, 800, 1000, 1200, 1400'
+  assign loading = 'lazy'
+  assign priority = 'auto'
+  if eager
+    assign loading = 'eager'
+    assign priority = 'high'
+  endif
+-%}
+{%- if image != blank -%}
+  {{
+    image
+    | image_url: width: 1400
+    | image_tag:
+      widths: widths,
+      sizes: sizes,
+      loading: loading,
+      fetchpriority: priority,
+      alt: image.alt | default: alt,
+      class: class
+  }}
+{%- else -%}
+  {%- liquid
+    case fallback
+      when 'daypack-black.jpg', 'sling-olive.jpg', 'tote-sand.jpg'
+        assign w = 933
+        assign h = 1400
+      when 'daypack-olive.jpg'
+        assign w = 1120
+        assign h = 1400
+      when 'pouch-sand.jpg', 'tote-olive.jpg'
+        assign w = 1050
+        assign h = 1400
+      when 'lifestyle-platform.jpg', 'rolltop-sand.jpg'
+        assign w = 1400
+        assign h = 1050
+      when 'duffel-sand.jpg'
+        assign w = 1400
+        assign h = 930
+      else
+        assign w = 1400
+        assign h = 934
+    endcase
+  -%}
+  <img
+    src="{{ fallback | asset_url }}"
+    alt="{{ alt | escape }}"
+    width="{{ w }}"
+    height="{{ h }}"
+    loading="{{ loading }}"
+    fetchpriority="{{ priority }}"
+    {% if class %}
+      class="{{ class }}"
+    {% endif %}
+  >
+{%- endif -%}

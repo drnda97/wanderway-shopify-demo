@@ -1,0 +1,95 @@
+{%- comment -%}
+  Wander Way demo – hand-picked product grid ("The core four.").
+  One block per product, each with the colour the card should open on.
+{%- endcomment -%}
+{{ 'ww-home.css' | asset_url | stylesheet_tag }}
+{{ 'ww-card.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'ww-card-swatches.js' | asset_url }}" defer="defer"></script>
+
+{%- assign s = section.settings -%}
+<section class="ww-featured ww-section ww-scope page-width" aria-labelledby="WWFeaturedHeading-{{ section.id }}">
+  <div class="ww-featured__header">
+    <div class="ww-featured__titles">
+      {%- if s.eyebrow != blank -%}
+        <p class="ww-eyebrow ww-featured__eyebrow">{{ s.eyebrow | escape }}</p>
+      {%- endif -%}
+      <h2 id="WWFeaturedHeading-{{ section.id }}" class="ww-h2">
+        {{- s.heading | escape }}
+        {% if s.heading_italic != blank %}<em>{{ s.heading_italic | escape }}</em>{% endif -%}
+      </h2>
+    </div>
+    {%- if s.link_label != blank -%}
+      <a class="ww-link-arrow ww-featured__link" href="{{ s.link | default: routes.all_products_collection_url }}">
+        <span class="ww-featured__link-desktop">{{ s.link_label | escape }}</span>
+        <span class="ww-featured__link-mobile">{{ s.link_label_mobile | default: s.link_label | escape }}</span>
+        {%- render 'ww-icon', icon: 'arrow-right', size: 16, stroke: 1.8 -%}
+      </a>
+    {%- endif -%}
+  </div>
+
+  <ul class="ww-featured__grid" role="list">
+    {%- for block in section.blocks -%}
+      {%- assign block_product = block.settings.product | default: all_products[block.settings.product_handle] -%}
+      {%- if block_product.id != blank -%}
+        <li {{ block.shopify_attributes }}>
+          {%- render 'ww-card-product',
+            card_product: block_product,
+            colour: block.settings.colour,
+            badges: s.badges,
+            sizes: '(min-width: 990px) 304px, 50vw'
+          -%}
+        </li>
+      {%- elsif request.design_mode -%}
+        <li {{ block.shopify_attributes }}>
+          <div class="ww-featured__placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+        </li>
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+</section>
+
+{% schema %}
+{
+  "name": "WW: Featured products",
+  "tag": "div",
+  "class": "section-ww-featured",
+  "max_blocks": 8,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Featured" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The core" },
+    { "type": "text", "id": "heading_italic", "label": "Italic last word", "default": "four." },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "View all products" },
+    { "type": "text", "id": "link_label_mobile", "label": "Link label on mobile", "default": "View all" },
+    { "type": "url", "id": "link", "label": "Link", "info": "Defaults to all products." },
+    {
+      "type": "text",
+      "id": "badges",
+      "label": "Badges from tags",
+      "info": "tag:Label pairs, comma separated.",
+      "default": "bestseller:Bestseller, new:New"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Product" },
+        {
+          "type": "text",
+          "id": "product_handle",
+          "label": "Fallback product handle",
+          "info": "Used when no product is picked, so the demo works right after the CSV import."
+        },
+        { "type": "text", "id": "colour", "label": "Colour to show first", "info": "Must match a Color option value, e.g. Olive." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "WW: Featured products",
+      "blocks": [{ "type": "product" }, { "type": "product" }, { "type": "product" }, { "type": "product" }]
+    }
+  ]
+}
+{% endschema %}

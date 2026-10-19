@@ -10,6 +10,8 @@
   --ww-glass-strong: rgba(255, 255, 255, 0.94); /* floating cards on photos */
   --ww-swatch-inset: inset 0 0 0 1px rgba(17, 17, 20, 0.12);
   --ww-ghost-border: rgba(250, 250, 252, 0.5);
+  --ww-scrim-side: linear-gradient(90deg, rgba(14, 14, 18, 0.78) 0%, rgba(14, 14, 18, 0.45) 45%, rgba(14, 14, 18, 0) 75%);
+  --ww-scrim-bottom: linear-gradient(0deg, rgba(14, 14, 18, 0.82) 0%, rgba(14, 14, 18, 0.35) 55%, rgba(14, 14, 18, 0) 80%);
 }
 
 /* ---- Base --------------------------------------------------------------- */
@@ -147,18 +149,22 @@ em {
 }
 
 .ww-btn--primary,
-.ww-btn--primary:hover,
-.ww-section .ww-btn--primary:hover {
+.ww-btn--ghost,
+.ww-scope .ww-btn--primary,
+.ww-scope .ww-btn--primary:hover,
+.ww-scope .ww-btn--ghost,
+.ww-scope .ww-btn--ghost:hover {
   color: var(--ww-on-dark);
 }
 
-.ww-section .ww-btn--secondary:hover,
-.ww-section .ww-btn--inverse:hover {
+.ww-scope .ww-btn--secondary,
+.ww-scope .ww-btn--secondary:hover,
+.ww-scope .ww-btn--inverse,
+.ww-scope .ww-btn--inverse:hover {
   color: var(--ww-ink);
 }
 
-.ww-section .ww-btn--ghost:hover {
-  color: var(--ww-on-dark);
+.ww-scope .ww-btn--ghost:hover {
   border-color: var(--ww-on-dark);
 }
 

@@ -1,120 +1,246 @@
 {
   "sections": {
-    "image_banner": {
-      "type": "image-banner",
+    "hero": {
+      "type": "ww-hero",
+      "settings": {
+        "eyebrow": "Travel bags & accessories · Demo collection",
+        "eyebrow_mobile": "Travel bags · Demo collection",
+        "heading": "Bags that make every trip feel",
+        "heading_italic": "lighter.",
+        "text": "Four everyday travel pieces in three colours. A fictional line, built on Shopify by Wander Way to show what a custom Dawn theme can do.",
+        "text_mobile": "Four everyday travel pieces in three colours. A fictional line, built on Shopify by Wander Way.",
+        "button_1_label": "Shop the collection",
+        "button_2_label": "See the product page",
+        "trust_1": "Free shipping over €150",
+        "trust_2": "30-day returns",
+        "trust_3": "Demo checkout only",
+        "image_alt": "Overnight Weekender in Sand on a wooden floor beside a white chair",
+        "pill": "AW26 · Demo",
+        "product_colour": "Sand"
+      }
+    },
+    "featured": {
+      "type": "ww-featured-products",
       "blocks": {
-        "heading": {
-          "type": "heading",
+        "product_1": {
+          "type": "product",
           "settings": {
-            "heading": "Browse our latest products",
-            "heading_size": "h0"
+            "product_handle": "transit-daypack-22l",
+            "colour": "Olive"
           }
         },
-        "button": {
-          "type": "buttons",
+        "product_2": {
+          "type": "product",
           "settings": {
-            "button_label_1": "Shop all",
-            "button_link_1": "shopify://collections/all",
-            "button_style_secondary_1": true,
-            "button_label_2": "",
-            "button_link_2": "",
-            "button_style_secondary_2": false
+            "product_handle": "overnight-weekender-40l",
+            "colour": "Sand"
+          }
+        },
+        "product_3": {
+          "type": "product",
+          "settings": {
+            "product_handle": "everyday-tote",
+            "colour": "Sand"
+          }
+        },
+        "product_4": {
+          "type": "product",
+          "settings": {
+            "product_handle": "essentials-pouch",
+            "colour": "Sand"
           }
         }
       },
       "block_order": [
-        "heading",
-        "button"
+        "product_1",
+        "product_2",
+        "product_3",
+        "product_4"
       ],
       "settings": {
-        "image_overlay_opacity": 40,
-        "image_height": "large",
-        "desktop_content_position": "bottom-center",
-        "show_text_box": false,
-        "image_behavior": "none",
-        "desktop_content_alignment": "center",
-        "color_scheme": "scheme-3",
-        "mobile_content_alignment": "center",
-        "stack_images_on_mobile": false,
-        "show_text_below": false
+        "eyebrow": "Featured",
+        "heading": "The core",
+        "heading_italic": "four.",
+        "link_label": "View all products",
+        "link_label_mobile": "View all",
+        "badges": "bestseller:Bestseller, new:New"
       }
     },
-    "featured_collection": {
-      "type": "featured-collection",
+    "editorial": {
+      "type": "ww-editorial-banner",
       "settings": {
-        "title": "Featured products",
-        "heading_size": "h2",
-        "description": "",
-        "show_description": false,
-        "description_style": "body",
-        "collection": "all",
-        "products_to_show": 8,
-        "columns_desktop": 4,
-        "color_scheme": "scheme-1",
-        "full_width": false,
-        "show_view_all": true,
-        "view_all_style": "solid",
-        "enable_desktop_slider": false,
-        "swipe_on_mobile": false,
-        "image_ratio": "adapt",
-        "image_shape": "default",
-        "show_secondary_image": true,
-        "show_vendor": false,
-        "show_rating": false,
-        "quick_add": "none",
-        "columns_mobile": "2",
-        "padding_top": 44,
-        "padding_bottom": 36
+        "image_alt": "A traveller with a backpack watching a train pass on a platform",
+        "eyebrow": "Journal · The in-between",
+        "heading": "Made for platforms, layovers and the long way",
+        "heading_italic": "home.",
+        "text": "Everything we design is tested on trains, in overhead bins and under café tables before it gets a name.",
+        "button_1_label": "Shop travel bags",
+        "button_2_label": "Read the journal"
       }
     },
-    "ww_testimonials": {
+    "built_with": {
+      "type": "ww-built-with",
+      "blocks": {
+        "tool_1": {
+          "type": "item",
+          "settings": {
+            "icon": "drop",
+            "name": "Liquid",
+            "caption": "Sections & blocks",
+            "caption_mobile": ""
+          }
+        },
+        "tool_2": {
+          "type": "item",
+          "settings": {
+            "icon": "code",
+            "name": "JavaScript",
+            "caption": "Vanilla web components",
+            "caption_mobile": "Web components"
+          }
+        },
+        "tool_3": {
+          "type": "item",
+          "settings": {
+            "icon": "terminal",
+            "name": "Shopify CLI",
+            "caption": "Local dev & deploys",
+            "caption_mobile": ""
+          }
+        },
+        "tool_4": {
+          "type": "item",
+          "settings": {
+            "icon": "check-circle",
+            "name": "Theme Check",
+            "caption": "Linted, zero offences",
+            "caption_mobile": "Zero offences"
+          }
+        }
+      },
+      "block_order": [
+        "tool_1",
+        "tool_2",
+        "tool_3",
+        "tool_4"
+      ],
+      "settings": {
+        "eyebrow": "Built with",
+        "heading": "A custom Dawn theme,",
+        "heading_italic": "no page builders."
+      }
+    },
+    "reviews": {
       "type": "ww-testimonials",
       "blocks": {
-        "t0": {
-          "type": "testimonial",
+        "review_1": {
+          "type": "review",
           "settings": {
-            "author": "Sample customer A",
-            "location": "Demo review",
-            "rating": 5
+            "rating": 5,
+            "quote": "Fits a 14-inch laptop and two days of clothes, and still slides under the seat. The olive is even better in person.",
+            "reviewer": "Sample reviewer · Ljubljana",
+            "date": "",
+            "product_handle": "transit-daypack-22l",
+            "colour": "Olive"
           }
         },
-        "t1": {
-          "type": "testimonial",
+        "review_2": {
+          "type": "review",
           "settings": {
-            "author": "Sample customer B",
-            "location": "Demo review",
-            "rating": 5
+            "rating": 5,
+            "quote": "Took it on the train to Vienna. It opens wide like a doctor’s bag, so packing takes minutes.",
+            "reviewer": "Sample reviewer · Novi Sad",
+            "date": "",
+            "product_handle": "overnight-weekender-40l",
+            "colour": "Sand"
           }
         },
-        "t2": {
-          "type": "testimonial",
+        "review_3": {
+          "type": "review",
           "settings": {
-            "author": "Sample customer C",
-            "location": "Demo review",
-            "rating": 4
+            "rating": 4,
+            "quote": "Toiletries, cables and charger in one place. Small thing, big difference at airport security.",
+            "reviewer": "Sample reviewer · Berlin",
+            "date": "",
+            "product_handle": "essentials-pouch",
+            "colour": "Sand"
           }
         },
-        "t3": {
-          "type": "testimonial",
+        "review_4": {
+          "type": "review",
           "settings": {
-            "author": "Sample customer D",
-            "location": "Demo review",
-            "rating": 5
+            "rating": 5,
+            "quote": "Sturdy canvas that doesn’t slump when it’s half empty. Market on Saturday, office on Monday.",
+            "reviewer": "Sample reviewer · Zagreb",
+            "date": "",
+            "product_handle": "everyday-tote",
+            "colour": "Olive"
+          }
+        },
+        "review_5": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "quote": "Straps stay comfortable after a full day of walking and the zips feel properly solid.",
+            "reviewer": "Sample reviewer · Vienna",
+            "date": "",
+            "product_handle": "transit-daypack-22l",
+            "colour": "Black"
+          }
+        },
+        "review_6": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "quote": "Bought one in Black, came back for Sand. The colours look exactly like the photos.",
+            "reviewer": "Sample reviewer · Budapest",
+            "date": "",
+            "product_handle": "transit-daypack-22l",
+            "colour": "Sand"
           }
         }
       },
       "block_order": [
-        "t0",
-        "t1",
-        "t2",
-        "t3"
+        "review_1",
+        "review_2",
+        "review_3",
+        "review_4",
+        "review_5",
+        "review_6"
       ],
-      "settings": {}
+      "settings": {
+        "layout": "grid",
+        "eyebrow": "Reviews",
+        "heading": "Packed, carried,",
+        "heading_italic": "approved.",
+        "rating_value": "4.8",
+        "rating_label": "Average from 126 sample reviews",
+        "tag": "Sample review",
+        "prev_label": "Previous reviews",
+        "next_label": "Next reviews"
+      }
+    },
+    "newsletter": {
+      "type": "ww-newsletter",
+      "settings": {
+        "image_alt": "A traveller resting on a sunny station platform with a backpack",
+        "eyebrow": "Newsletter",
+        "heading": "Notes from the",
+        "heading_italic": "road.",
+        "text": "Packing lists, new colours and the odd restock. One email a month, at most.",
+        "label": "Email address",
+        "placeholder": "you@example.com",
+        "button_label": "Subscribe",
+        "note": "Demo form – nothing is sent or stored."
+      }
     }
   },
   "order": [
-    "image_banner",
-    "featured_collection",
-    "ww_testimonials"
+    "hero",
+    "featured",
+    "editorial",
+    "built_with",
+    "reviews",
+    "newsletter"
   ]
 }

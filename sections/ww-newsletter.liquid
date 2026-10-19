@@ -1,0 +1,97 @@
+{%- comment -%}
+  Wander Way demo – newsletter card. Uses Dawn's customer form so sign-ups
+  really work; the note text stays (it's a demo store).
+{%- endcomment -%}
+{{ 'ww-home.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign s = section.settings
+  assign form_id = 'WWNewsletter-' | append: section.id
+-%}
+<section class="ww-newsletter ww-section ww-scope page-width" aria-labelledby="WWNewsletterHeading-{{ section.id }}">
+  <div class="ww-newsletter__card">
+    <div class="ww-newsletter__media">
+      {%- render 'ww-image',
+        image: s.image,
+        fallback: 'lifestyle-station.jpg',
+        alt: s.image_alt,
+        sizes: '(min-width: 990px) 600px, 100vw',
+        class: 'ww-newsletter__img'
+      -%}
+    </div>
+    <div class="ww-newsletter__body">
+      {%- if s.eyebrow != blank -%}
+        <p class="ww-eyebrow ww-newsletter__eyebrow">{{ s.eyebrow | escape }}</p>
+      {%- endif -%}
+      <h2 id="WWNewsletterHeading-{{ section.id }}" class="ww-h2">
+        {{- s.heading | escape }}
+        {% if s.heading_italic != blank %}<em>{{ s.heading_italic | escape }}</em>{% endif -%}
+      </h2>
+      {%- if s.text != blank -%}
+        <p class="ww-newsletter__text">{{ s.text | escape }}</p>
+      {%- endif -%}
+      {%- form 'customer', id: form_id, class: 'ww-newsletter__form' -%}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <label class="ww-newsletter__label" for="WWNewsletterEmail-{{ section.id }}">{{ s.label | escape }}</label>
+        <div class="ww-newsletter__row">
+          <input
+            id="WWNewsletterEmail-{{ section.id }}"
+            class="ww-newsletter__input"
+            type="email"
+            name="contact[email]"
+            value="{{ form.email }}"
+            autocomplete="email"
+            autocorrect="off"
+            autocapitalize="off"
+            placeholder="{{ s.placeholder | escape }}"
+            required
+            {% if form.errors %}
+              aria-invalid="true" aria-describedby="WWNewsletterStatus-{{ section.id }}"
+            {% endif %}
+          >
+          <button type="submit" class="ww-btn ww-btn--primary ww-newsletter__button">{{ s.button_label | escape }}</button>
+        </div>
+        <p id="WWNewsletterStatus-{{ section.id }}" class="ww-newsletter__note" role="status">
+          {%- if form.posted_successfully? -%}
+            {{ 'newsletter.success' | t }}
+          {%- elsif form.errors -%}
+            {{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}
+          {%- else -%}
+            {{ s.note | escape }}
+          {%- endif -%}
+        </p>
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "WW: Newsletter",
+  "tag": "div",
+  "class": "section-ww-newsletter",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image", "info": "Falls back to the bundled station photo." },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Fallback image alt text",
+      "default": "A traveller resting on a sunny station platform with a backpack"
+    },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "info": "Hidden on mobile.", "default": "Newsletter" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Notes from the" },
+    { "type": "text", "id": "heading_italic", "label": "Italic last word", "default": "road." },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Packing lists, new colours and the odd restock. One email a month, at most."
+    },
+    { "type": "text", "id": "label", "label": "Field label", "default": "Email address" },
+    { "type": "text", "id": "placeholder", "label": "Placeholder", "default": "you@example.com" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Subscribe" },
+    { "type": "text", "id": "note", "label": "Note", "default": "Demo form – nothing is sent or stored." }
+  ],
+  "presets": [{ "name": "WW: Newsletter" }]
+}
+{% endschema %}

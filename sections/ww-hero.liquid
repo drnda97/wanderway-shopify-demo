@@ -1,0 +1,154 @@
+{%- comment -%}
+  Wander Way demo – home hero. Two columns (copy / image) with a floating
+  product card on the photo. Stacks on mobile with full-width buttons.
+{%- endcomment -%}
+{{ 'ww-home.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign s = section.settings
+  assign card_product = s.product | default: all_products['overnight-weekender-40l']
+  assign card_variant = card_product.selected_or_first_available_variant
+  if card_product.id != blank and s.product_colour != blank
+    for variant in card_product.variants
+      if variant.options contains s.product_colour
+        assign card_variant = variant
+        break
+      endif
+    endfor
+  endif
+  assign card_image = card_variant.featured_image | default: card_product.featured_image
+  assign button_1_link = s.button_1_link | default: routes.all_products_collection_url
+  assign button_2_link = s.button_2_link | default: '/products/transit-daypack-22l'
+-%}
+
+<section class="ww-hero ww-scope page-width" aria-labelledby="WWHeroHeading-{{ section.id }}">
+  <div class="ww-hero__content">
+    {%- if s.eyebrow != blank -%}
+      <p class="ww-eyebrow ww-hero__eyebrow">
+        <span class="ww-hero__desktop-copy">{{ s.eyebrow | escape }}</span>
+        <span class="ww-hero__mobile-copy">{{ s.eyebrow_mobile | default: s.eyebrow | escape }}</span>
+      </p>
+    {%- endif -%}
+    <h1 id="WWHeroHeading-{{ section.id }}" class="ww-h1 ww-hero__heading">
+      {{- s.heading | escape }}
+      {% if s.heading_italic != blank %}<em>{{ s.heading_italic | escape }}</em>{% endif -%}
+    </h1>
+    {%- if s.text != blank -%}
+      <p class="ww-hero__text">
+        <span class="ww-hero__desktop-copy">{{ s.text | escape }}</span>
+        <span class="ww-hero__mobile-copy">{{ s.text_mobile | default: s.text | escape }}</span>
+      </p>
+    {%- endif -%}
+    <div class="ww-hero__buttons">
+      {%- if s.button_1_label != blank -%}
+        <a class="ww-btn ww-btn--primary" href="{{ button_1_link }}">
+          {{- s.button_1_label | escape -}}
+          {%- render 'ww-icon', icon: 'arrow-right', size: 18, stroke: 1.8 -%}
+        </a>
+      {%- endif -%}
+      {%- if s.button_2_label != blank -%}
+        <a class="ww-btn ww-btn--secondary" href="{{ button_2_link }}">{{ s.button_2_label | escape }}</a>
+      {%- endif -%}
+    </div>
+    <ul class="ww-hero__trust" role="list">
+      {%- for i in (1..3) -%}
+        {%- assign key = 'trust_' | append: i -%}
+        {%- if s[key] != blank -%}
+          <li>{{ s[key] | escape }}</li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+
+  <div class="ww-hero__visual">
+    <div class="ww-hero__media">
+      {%- render 'ww-image',
+        image: s.image,
+        fallback: 'weekender-sand.jpg',
+        alt: s.image_alt,
+        sizes: '(min-width: 990px) 640px, 100vw',
+        eager: true,
+        class: 'ww-hero__img'
+      -%}
+    </div>
+    {%- if s.pill != blank -%}
+      <span class="ww-pill ww-hero__pill">{{ s.pill | escape }}</span>
+    {%- endif -%}
+    {%- if card_product.id != blank -%}
+      <div class="ww-hero__card">
+        {%- if card_image -%}
+          {{ card_image | image_url: width: 120 | image_tag: width: 52, height: 52, alt: '', class: 'ww-hero__card-img' }}
+        {%- else -%}
+          <img src="{{ 'weekender-sand.jpg' | asset_url }}" alt="" width="52" height="52" class="ww-hero__card-img">
+        {%- endif -%}
+        <div class="ww-hero__card-text">
+          <span class="ww-hero__card-title">{{ card_product.title | escape }}</span>
+          <span class="ww-hero__card-meta">
+            {{- card_variant.price | money_without_trailing_zeros -}}
+            {%- if s.product_colour != blank %} · {{ s.product_colour | escape }}{% endif -%}
+          </span>
+        </div>
+        <a
+          class="ww-hero__card-link"
+          href="{{ card_variant.url | default: card_product.url }}"
+          aria-label="View {{ card_product.title | escape }}"
+        >
+          {%- render 'ww-icon', icon: 'arrow-right', size: 16, stroke: 1.8 -%}
+        </a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "WW: Hero",
+  "tag": "div",
+  "class": "section-ww-hero",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Travel bags & accessories · Demo collection" },
+    { "type": "text", "id": "eyebrow_mobile", "label": "Eyebrow on mobile", "info": "Optional shorter version.", "default": "Travel bags · Demo collection" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Bags that make every trip feel" },
+    { "type": "text", "id": "heading_italic", "label": "Italic last word", "default": "lighter." },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "default": "Four everyday travel pieces in three colours. A fictional line, built on Shopify by Wander Way to show what a custom Dawn theme can do."
+    },
+    {
+      "type": "textarea",
+      "id": "text_mobile",
+      "label": "Text on mobile",
+      "info": "Optional shorter version.",
+      "default": "Four everyday travel pieces in three colours. A fictional line, built on Shopify by Wander Way."
+    },
+    { "type": "header", "content": "Buttons" },
+    { "type": "text", "id": "button_1_label", "label": "Primary label", "default": "Shop the collection" },
+    { "type": "url", "id": "button_1_link", "label": "Primary link", "info": "Defaults to all products." },
+    { "type": "text", "id": "button_2_label", "label": "Secondary label", "default": "See the product page" },
+    { "type": "url", "id": "button_2_link", "label": "Secondary link", "info": "Defaults to the Transit Daypack." },
+    { "type": "header", "content": "Trust line" },
+    { "type": "text", "id": "trust_1", "label": "Item 1", "default": "Free shipping over €150" },
+    { "type": "text", "id": "trust_2", "label": "Item 2", "default": "30-day returns" },
+    { "type": "text", "id": "trust_3", "label": "Item 3", "default": "Demo checkout only" },
+    { "type": "header", "content": "Image" },
+    { "type": "image_picker", "id": "image", "label": "Image", "info": "Falls back to the bundled weekender photo." },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Fallback image alt text",
+      "default": "Overnight Weekender in Sand on a wooden floor beside a white chair"
+    },
+    { "type": "text", "id": "pill", "label": "Pill text", "default": "AW26 · Demo" },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Floating card product",
+      "info": "Defaults to the Overnight Weekender 40L."
+    },
+    { "type": "text", "id": "product_colour", "label": "Floating card colour", "default": "Sand" }
+  ],
+  "presets": [{ "name": "WW: Hero" }]
+}
+{% endschema %}

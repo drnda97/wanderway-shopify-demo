@@ -1,0 +1,71 @@
+{%- comment -%}
+  Wander Way demo – full-width editorial banner inside the page width:
+  photo, left-to-right gradient (bottom-up on mobile), copy bottom-left.
+{%- endcomment -%}
+{{ 'ww-home.css' | asset_url | stylesheet_tag }}
+
+{%- assign s = section.settings -%}
+<section class="ww-editorial ww-section ww-scope page-width" aria-labelledby="WWEditorialHeading-{{ section.id }}">
+  <div class="ww-editorial__card">
+    {%- render 'ww-image',
+      image: s.image,
+      fallback: 'lifestyle-platform.jpg',
+      alt: s.image_alt,
+      sizes: '(min-width: 1440px) 1280px, 100vw',
+      class: 'ww-editorial__img'
+    -%}
+    <div class="ww-editorial__overlay" aria-hidden="true"></div>
+    <div class="ww-editorial__content">
+      {%- if s.eyebrow != blank -%}
+        <p class="ww-eyebrow ww-editorial__eyebrow">{{ s.eyebrow | escape }}</p>
+      {%- endif -%}
+      <h2 id="WWEditorialHeading-{{ section.id }}" class="ww-h2 ww-editorial__heading">
+        {{- s.heading | escape }}
+        {% if s.heading_italic != blank %}<em>{{ s.heading_italic | escape }}</em>{% endif -%}
+      </h2>
+      {%- if s.text != blank -%}
+        <p class="ww-editorial__text">{{ s.text | escape }}</p>
+      {%- endif -%}
+      <div class="ww-editorial__buttons">
+        {%- if s.button_1_label != blank -%}
+          <a class="ww-btn ww-btn--inverse" href="{{ s.button_1_link | default: '/collections/travel' }}">{{ s.button_1_label | escape }}</a>
+        {%- endif -%}
+        {%- if s.button_2_label != blank -%}
+          <a class="ww-btn ww-btn--ghost ww-editorial__ghost" href="{{ s.button_2_link | default: '/blogs/news' }}">{{ s.button_2_label | escape }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "WW: Editorial banner",
+  "tag": "div",
+  "class": "section-ww-editorial",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image", "info": "Falls back to the bundled platform photo." },
+    {
+      "type": "text",
+      "id": "image_alt",
+      "label": "Fallback image alt text",
+      "default": "A traveller with a backpack watching a train pass on a platform"
+    },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Journal · The in-between" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Made for platforms, layovers and the long way" },
+    { "type": "text", "id": "heading_italic", "label": "Italic last word", "default": "home." },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Text",
+      "info": "Hidden on mobile.",
+      "default": "Everything we design is tested on trains, in overhead bins and under café tables before it gets a name."
+    },
+    { "type": "text", "id": "button_1_label", "label": "Primary button label", "default": "Shop travel bags" },
+    { "type": "url", "id": "button_1_link", "label": "Primary button link", "info": "Defaults to /collections/travel." },
+    { "type": "text", "id": "button_2_label", "label": "Ghost button label", "info": "Hidden on mobile.", "default": "Read the journal" },
+    { "type": "url", "id": "button_2_link", "label": "Ghost button link", "info": "Defaults to /blogs/news." }
+  ],
+  "presets": [{ "name": "WW: Editorial banner" }]
+}
+{% endschema %}
