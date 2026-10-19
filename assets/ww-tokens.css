@@ -1,0 +1,137 @@
+/* ==========================================================================
+   Wander Way demo — design tokens (source of truth)
+   Load after Dawn's base.css:  {{ 'ww-tokens.css' | asset_url | stylesheet_tag }}
+   Every value here comes 1:1 from the design reference (reference/source/*.dc.html).
+   ========================================================================== */
+
+:root {
+  /* ---- Colour ---------------------------------------------------------- */
+  --ww-bg: #FAFAFC;              /* page background */
+  --ww-surface: #FFFFFF;         /* cards, drawer, inputs */
+  --ww-surface-2: #F2F2F6;       /* newsletter, muted tiles */
+  --ww-surface-3: #F5F5F8;       /* delivery-estimate inner tiles */
+  --ww-ink: #111114;             /* text, primary button */
+  --ww-ink-hover: #2A2A31;       /* primary button hover */
+  --ww-ink-2: #4A4A55;           /* body copy, secondary text */
+  --ww-ink-3: #5C5C69;           /* labels, meta, eyebrows */
+  --ww-border: #E4E4EA;          /* dividers, card outline */
+  --ww-border-soft: #ECECF1;     /* inner dividers */
+  --ww-border-strong: #CFCFD8;   /* inputs, secondary button */
+  --ww-accent: #3346E0;          /* progress bars, timer icon, focus ring */
+  --ww-success: #1F6B45;         /* stock text */
+  --ww-success-dot: #2E9E63;     /* stock dot, unlocked bar */
+  --ww-star-off: #D6D6DE;
+  --ww-on-dark: #FAFAFC;
+  --ww-on-dark-muted: #D6D6DE;
+
+  /* Product colours (variant option "Color") */
+  --ww-swatch-black: #1F1F22;  --ww-tint-black: #E9E9EE;
+  --ww-swatch-sand:  #D3BF9C;  --ww-tint-sand:  #F2EDE3;
+  --ww-swatch-olive: #5F6B3C;  --ww-tint-olive: #E7EADD;
+
+  /* ---- Type ------------------------------------------------------------ */
+  --ww-font-sans: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ww-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* desktop (>= 990px) */
+  --ww-h1: 76px;  --ww-h1-lh: 1.02; --ww-h1-ls: -0.035em;
+  --ww-h1-pdp: 52px;                                  /* product title */
+  --ww-h2: 48px;  --ww-h2-lh: 1.08; --ww-h2-ls: -0.03em;
+  --ww-h3: 36px;  --ww-h3-lh: 1.10; --ww-h3-ls: -0.03em;
+  --ww-h4: 20px;  --ww-h4-lh: 1.30; --ww-h4-ls: -0.01em;
+  --ww-body: 17px; --ww-body-lh: 1.6;
+  --ww-small: 14px;
+  --ww-eyebrow: 12px; --ww-eyebrow-ls: 0.08em;      /* mono, uppercase */
+  --ww-weight-heading: 500;
+  --ww-weight-accent: 400;                          /* the italic word */
+
+  /* ---- Radius ---------------------------------------------------------- */
+  --ww-radius-pill: 999px;   /* buttons, inputs, chips, swatches */
+  --ww-radius-xl: 28px;      /* hero media, feature blocks, newsletter */
+  --ww-radius-lg: 20px;      /* product cards, panels, testimonial cards */
+  --ww-radius-md: 16px;      /* thumbnails, inner cards */
+  --ww-radius-sm: 12px;      /* selects, tiles, mini images */
+
+  /* ---- Spacing scale --------------------------------------------------- */
+  --ww-space-1: 4px;   --ww-space-2: 8px;   --ww-space-3: 12px;  --ww-space-4: 16px;
+  --ww-space-5: 20px;  --ww-space-6: 24px;  --ww-space-8: 32px;  --ww-space-12: 48px;
+  --ww-space-16: 64px; --ww-space-20: 80px; --ww-space-24: 96px; --ww-space-30: 120px;
+  --ww-gutter: 80px;            /* page side padding @1440 → 1280 content */
+  --ww-section-gap: 120px;      /* vertical rhythm between sections */
+  --ww-grid-gap: 24px;
+
+  /* ---- Elevation / motion --------------------------------------------- */
+  --ww-shadow-float: 0 16px 40px -20px rgba(17, 17, 20, 0.35);
+  --ww-shadow-drawer: -24px 0 60px -30px rgba(17, 17, 20, 0.5);
+  --ww-overlay: rgba(17, 17, 20, 0.42);
+  --ww-ease: cubic-bezier(.2, .7, .2, 1);
+  --ww-dur-img: 500ms;          /* card image hover scale(1.03) */
+  --ww-dur-ui: 240ms;
+
+  /* ---- Buttons --------------------------------------------------------- */
+  --ww-btn-h: 52px;  --ww-btn-h-lg: 56px;  --ww-btn-h-sm: 44px;
+  --ww-btn-px: 26px; --ww-btn-fs: 16px;    --ww-btn-fw: 500;
+}
+
+@media (max-width: 749px) {
+  :root {
+    --ww-h1: 44px;  --ww-h1-lh: 1.04;
+    --ww-h1-pdp: 36px;
+    --ww-h2: 32px;  --ww-h2-lh: 1.10;
+    --ww-h3: 28px;  --ww-h3-lh: 1.12;
+    --ww-h4: 18px;
+    --ww-body: 16px;
+    --ww-small: 13.5px;
+    --ww-eyebrow: 11px;
+    --ww-gutter: 20px;
+    --ww-section-gap: 64px;
+    --ww-grid-gap: 12px;
+  }
+}
+
+/* ---- Base helpers (use these classes inside ww-* sections) -------------- */
+.ww-eyebrow { font-family: var(--ww-font-mono); font-size: var(--ww-eyebrow); letter-spacing: var(--ww-eyebrow-ls); text-transform: uppercase; color: var(--ww-ink-3); }
+.ww-h1, .ww-h2, .ww-h3, .ww-h4 { font-family: var(--ww-font-sans); font-weight: var(--ww-weight-heading); color: var(--ww-ink); margin: 0; }
+.ww-h1 { font-size: var(--ww-h1); line-height: var(--ww-h1-lh); letter-spacing: var(--ww-h1-ls); }
+.ww-h2 { font-size: var(--ww-h2); line-height: var(--ww-h2-lh); letter-spacing: var(--ww-h2-ls); }
+.ww-h3 { font-size: var(--ww-h3); line-height: var(--ww-h3-lh); letter-spacing: var(--ww-h3-ls); }
+.ww-h4 { font-size: var(--ww-h4); line-height: var(--ww-h4-lh); letter-spacing: var(--ww-h4-ls); }
+.ww-h1 em, .ww-h2 em, .ww-h3 em, .ww-h4 em { font-style: italic; font-weight: var(--ww-weight-accent); }
+
+.ww-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: var(--ww-btn-h); padding: 0 var(--ww-btn-px); border-radius: var(--ww-radius-pill); font: var(--ww-btn-fw) var(--ww-btn-fs)/1 var(--ww-font-sans); text-decoration: none; cursor: pointer; transition: background-color var(--ww-dur-ui) var(--ww-ease), border-color var(--ww-dur-ui) var(--ww-ease); }
+.ww-btn--primary { background: var(--ww-ink); color: var(--ww-on-dark); border: 0; }
+.ww-btn--primary:hover { background: var(--ww-ink-hover); }
+.ww-btn--secondary { background: var(--ww-surface); color: var(--ww-ink); border: 1px solid var(--ww-border-strong); }
+.ww-btn--secondary:hover { border-color: var(--ww-ink); }
+.ww-btn--inverse { background: var(--ww-on-dark); color: var(--ww-ink); border: 0; height: 50px; padding: 0 24px; }
+.ww-btn--ghost { background: transparent; color: var(--ww-on-dark); border: 1px solid rgba(250, 250, 252, 0.5); height: 50px; padding: 0 24px; }
+.ww-btn--lg { height: var(--ww-btn-h-lg); }
+.ww-icon-btn { width: 48px; height: 48px; border-radius: var(--ww-radius-pill); display: grid; place-items: center; border: 1px solid var(--ww-border-strong); background: var(--ww-surface); color: var(--ww-ink); cursor: pointer; }
+.ww-icon-btn--dark { background: var(--ww-ink); border-color: var(--ww-ink); color: var(--ww-on-dark); }
+.ww-tag { font-family: var(--ww-font-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ww-ink-3); border: 1px solid var(--ww-border); border-radius: var(--ww-radius-pill); padding: 3px 8px; }
+.ww-badge-demo { font-family: var(--ww-font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--ww-border-strong); border-radius: var(--ww-radius-pill); color: var(--ww-ink-2); }
+
+:where(.ww-scope) a:focus-visible, :where(.ww-scope) button:focus-visible, :where(.ww-scope) select:focus-visible, :where(.ww-scope) input:focus-visible { outline: 2px solid var(--ww-accent); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) { :where(.ww-scope) * { transition: none !important; } }
+
+/* ---- Dawn bridge: point Dawn's own variables at the tokens --------------
+   (ww-tokens.css must load AFTER base.css in layout/theme.liquid)          */
+:root {
+  --font-body-family: var(--ww-font-sans);
+  --font-body-style: normal;
+  --font-body-weight: 400;
+  --font-body-weight-bold: 600;
+  --font-heading-family: var(--ww-font-sans);
+  --font-heading-style: normal;
+  --font-heading-weight: 500;
+  --font-body-scale: 1;
+  --font-heading-scale: 1;
+  --buttons-radius: 999px;
+  --buttons-radius-outset: 999px;
+  --inputs-radius: 999px;
+  --inputs-radius-outset: 999px;
+  --product-card-corner-radius: 2rem;   /* 20px with Dawn's 62.5% root */
+  --page-width: 144rem;                 /* 1440 incl. 80px gutters */
+}
+body { background: var(--ww-bg); color: var(--ww-ink); font-size: var(--ww-body); line-height: var(--ww-body-lh); letter-spacing: 0; -webkit-font-smoothing: antialiased; }

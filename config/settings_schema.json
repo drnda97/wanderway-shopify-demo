@@ -1466,5 +1466,65 @@
         "label": "t:settings_schema.customer_accounts.settings.customer_account_menu.label"
       }
     ]
+  },
+  {
+    "name": "Wander Way demo",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Shared by the delivery estimate block on the product page and the cart drawer."
+      },
+      {
+        "type": "header",
+        "content": "Free shipping"
+      },
+      {
+        "type": "number",
+        "id": "ww_free_shipping_threshold",
+        "label": "Free shipping threshold (shop currency)",
+        "info": "0 hides the progress bars.",
+        "default": 150
+      },
+      {
+        "type": "product",
+        "id": "ww_cart_upsell",
+        "label": "Cart drawer upsell product",
+        "info": "Shown while the cart is under the threshold and the product isn't in the cart."
+      },
+      {
+        "type": "text",
+        "id": "ww_cart_upsell_label",
+        "label": "Upsell label",
+        "default": "Unlocks free shipping"
+      },
+      {
+        "type": "header",
+        "content": "Dispatch"
+      },
+      {
+        "type": "range",
+        "id": "ww_cutoff_hour",
+        "label": "Same-day dispatch cut-off",
+        "min": 0,
+        "max": 23,
+        "step": 1,
+        "unit": "h",
+        "default": 16
+      },
+      {
+        "type": "text",
+        "id": "ww_timezone",
+        "label": "Store timezone (IANA)",
+        "info": "Used for the cut-off countdown, e.g. Europe/Belgrade.",
+        "default": "Europe/Belgrade"
+      },
+      {
+        "type": "textarea",
+        "id": "ww_shipping_zones",
+        "label": "Shipping zones",
+        "info": "One per line: Name|minDays|maxDays|price|carrier. The first zone is the default.",
+        "default": "Serbia|1|2|€4.90|Local courier\nEuropean Union|3|5|€9.90|Tracked, DDP\nUnited Kingdom|4|6|€14.90|Tracked, duties paid\nRest of world|6|10|€24.90|Express, tracked"
+      }
+    ]
   }
 ]
