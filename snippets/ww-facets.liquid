@@ -1,0 +1,135 @@
+{%- comment -%}
+  Wander Way demo – vertical filter sidebar (desktop).
+  Markup follows the contract of Dawn's facets.js (facet-filters-form >
+  form#FacetFiltersForm, one .js-filter per filter with a stable id, a
+  .facets-wrap around the values, <price-range>), so Dawn's AJAX filtering,
+  history and caching work unchanged. Only the presentation is custom:
+  - Colour filters render as full-width rows with a colour dot
+  - Tag filters only show the tags listed in `category_tags`
+  - Availability renders as a single "In stock only" checkbox
+
+  Accepts:
+  - results: {Object} collection (required)
+  - category_tags: {String} comma-separated tags to show in tag filters
+  - in_stock_label: {String} label for the availability checkbox
+
+  Usage:
+  {% render 'ww-facets', results: collection, category_tags: 'backpacks, travel', in_stock_label: 'In stock only' %}
+{%- endcomment -%}
+{%- liquid
+  assign category_tags = category_tags | default: '' | downcase | split: ','
+-%}
+<facet-filters-form class="ww-facets">
+  <form id="FacetFiltersForm" class="ww-facets__form">
+    {%- if results.terms -%}
+      <input type="hidden" name="q" value="{{ results.terms | escape }}">
+      <input name="options[prefix]" type="hidden" value="last">
+    {%- endif -%}
+    <div id="FacetsWrapperDesktop">
+      {%- for filter in results.filters -%}
+        {%- liquid
+          assign param = filter.param_name | downcase
+          assign is_colour = false
+          if param contains 'color' or param contains 'colour'
+            assign is_colour = true
+          endif
+          assign is_tag = false
+          if param == 'filter.p.tag'
+            assign is_tag = true
+          endif
+          assign is_availability = false
+          if param == 'filter.v.availability'
+            assign is_availability = true
+          endif
+        -%}
+        <fieldset
+          id="Details-{{ filter.param_name | escape }}-{{ section.id }}"
+          class="js-filter ww-facet{% if is_colour %} ww-facet--colour{% endif %}"
+          data-index="{{ forloop.index }}"
+        >
+          <legend class="ww-facet__legend">{{ filter.label | escape }}</legend>
+
+          {%- case filter.type -%}
+            {%- when 'price_range' -%}
+              <price-range class="ww-facet__price facets-wrap">
+                {%- assign range_max = filter.range_max | money_without_currency -%}
+                <label class="ww-facet__price-field" for="Filter-{{ filter.param_name | escape }}-GTE">
+                  {{- 'products.facets.from' | t -}}
+                  <span class="ww-facet__price-input">
+                    <span aria-hidden="true">{{ cart.currency.symbol }}</span>
+                    <input
+                      id="Filter-{{ filter.param_name | escape }}-GTE"
+                      name="{{ filter.min_value.param_name }}"
+                      {% if filter.min_value.value %}
+                        value="{{ filter.min_value.value | money_without_currency }}"
+                      {% endif %}
+                      type="text"
+                      inputmode="decimal"
+                      placeholder="0"
+                      data-min="0"
+                      data-max="{{ range_max }}"
+                    >
+                  </span>
+                </label>
+                <label class="ww-facet__price-field" for="Filter-{{ filter.param_name | escape }}-LTE">
+                  {{- 'products.facets.to' | t -}}
+                  <span class="ww-facet__price-input">
+                    <span aria-hidden="true">{{ cart.currency.symbol }}</span>
+                    <input
+                      id="Filter-{{ filter.param_name | escape }}-LTE"
+                      name="{{ filter.max_value.param_name }}"
+                      {% if filter.max_value.value %}
+                        value="{{ filter.max_value.value | money_without_currency }}"
+                      {% endif %}
+                      type="text"
+                      inputmode="decimal"
+                      placeholder="{{ range_max }}"
+                      data-min="0"
+                      data-max="{{ range_max }}"
+                    >
+                  </span>
+                </label>
+              </price-range>
+
+            {%- else -%}
+              <ul class="ww-facet__list facets-wrap" role="list">
+                {%- if is_tag and category_tags.size > 0 -%}
+                  {%- comment -%} Allow-listed tags, in the order of the setting {%- endcomment -%}
+                  {%- for wanted in category_tags -%}
+                    {%- assign wanted = wanted | strip -%}
+                    {%- for value in filter.values -%}
+                      {%- assign value_lower = value.value | downcase -%}
+                      {%- if value_lower == wanted -%}
+                        {%- assign value_label = value.label | capitalize -%}
+                        {%- render 'ww-facet-value', filter: filter, value: value, index: forloop.index, label: value_label -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                  {%- endfor -%}
+                {%- else -%}
+                  {%- for value in filter.values -%}
+                    {%- if is_availability and value.value != '1' -%}
+                      {%- continue -%}
+                    {%- endif -%}
+                    {%- liquid
+                      assign value_label = value.label
+                      if is_availability and in_stock_label != blank
+                        assign value_label = in_stock_label
+                      endif
+                    -%}
+                    {%- render 'ww-facet-value',
+                      filter: filter,
+                      value: value,
+                      index: forloop.index,
+                      label: value_label,
+                      colour: is_colour,
+                      hide_count: is_availability
+                    -%}
+                  {%- endfor -%}
+                {%- endif -%}
+              </ul>
+          {%- endcase -%}
+        </fieldset>
+      {%- endfor -%}
+    </div>
+  </form>
+</facet-filters-form>

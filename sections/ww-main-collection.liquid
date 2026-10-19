@@ -1,0 +1,210 @@
+{%- comment -%}
+  Wander Way demo – collection page body.
+  Desktop (990+): filter sidebar (ww-facets) | toolbar + 3-column grid.
+  Below 990: "Filter" pill (Dawn's facets drawer), sort pill, colour chips.
+  Uses Dawn's facets.js unchanged: #ProductGridContainer, #ProductCount and
+  #product-grid[data-id] are re-rendered after every filter or sort change,
+  so the count, active chips and colour chips live inside the container.
+{%- endcomment -%}
+{{ 'ww-collection.css' | asset_url | stylesheet_tag }}
+{{ 'ww-card.css' | asset_url | stylesheet_tag }}
+{{ 'component-facets.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'facets.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'ww-card-swatches.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'ww-collection.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign s = section.settings
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+
+  comment
+    The colour filter (if any): its active value drives the cards' colour, and
+    its values become the chips on mobile.
+  endcomment
+  assign colour_filter = null
+  assign active_colour = ''
+  assign active_count = 0
+  for filter in collection.filters
+    assign param = filter.param_name | downcase
+    if param contains 'color' or param contains 'colour'
+      assign colour_filter = filter
+      assign active_colour = filter.active_values.first.value | default: ''
+    endif
+    assign active_count = active_count | plus: filter.active_values.size
+    if filter.type == 'price_range'
+      if filter.min_value.value != null or filter.max_value.value != null
+        assign active_count = active_count | plus: 1
+      endif
+    endif
+  endfor
+-%}
+
+<collection-component
+  view-event-payload="{{ collection | standard_event_data: 'view' | escape }}"
+  data-collection-id="{{ collection.id }}"
+>
+  <ww-collection class="ww-collection ww-section ww-scope page-width" data-section="{{ section.id }}">
+    {%- paginate collection.products by s.products_per_page -%}
+      {%- if s.enable_filtering -%}
+        <aside class="ww-collection__sidebar" aria-label="{{ 'products.facets.filter_button' | t }}">
+          {%- render 'ww-facets', results: collection, category_tags: s.category_tags, in_stock_label: s.in_stock_label -%}
+        </aside>
+      {%- endif -%}
+
+      <div class="ww-collection__main">
+        <div class="ww-collection__controls">
+          {%- if s.enable_filtering -%}
+            <div class="ww-collection__drawer">
+              {%- render 'facets',
+                results: collection,
+                enable_filtering: true,
+                enable_sorting: false,
+                filter_type: 'drawer',
+                paginate: paginate
+              -%}
+            </div>
+          {%- endif -%}
+
+          {%- if s.enable_sorting -%}
+            <facet-filters-form class="ww-collection__sort">
+              <form id="FacetSortForm">
+                <label class="ww-collection__sort-label" for="SortBy">
+                  <span class="ww-collection__sort-text">{{ 'products.facets.sort_by_label' | t | remove: ':' }}</span>
+                  <span class="ww-collection__sort-prefix" aria-hidden="true">{{ s.sort_prefix_mobile | escape }}</span>
+                  <select
+                    name="sort_by"
+                    id="SortBy"
+                    class="ww-collection__select"
+                    aria-describedby="a11y-refresh-page-message"
+                  >
+                    {%- for option in collection.sort_options -%}
+                      <option value="{{ option.value | escape }}" {% if option.value == sort_by %}selected{% endif %}>
+                        {%- if option.value == 'manual' and s.featured_label != blank -%}
+                          {{ s.featured_label | escape }}
+                        {%- else -%}
+                          {{ option.name | escape }}
+                        {%- endif -%}
+                      </option>
+                    {%- endfor -%}
+                  </select>
+                </label>
+              </form>
+            </facet-filters-form>
+          {%- endif -%}
+        </div>
+
+        <div id="ProductGridContainer" class="ww-collection__results">
+          <div class="ww-collection__summary">
+            {%- comment -%} Dawn's drawer renders #ProductCount (the live region facets.js updates); this is the visible copy. {%- endcomment -%}
+            <span class="ww-collection__count" data-active-filters="{{ active_count }}" aria-hidden="true">
+              <span class="ww-collection__count-desktop">{{ s.count_label | replace: '[count]', collection.products_count | escape }}</span>
+              <span class="ww-collection__count-mobile">{{ s.count_label_mobile | replace: '[count]', collection.products_count | escape }}</span>
+            </span>
+            <div class="ww-collection__chips active-facets-desktop">
+              {%- for filter in collection.filters -%}
+                {%- for value in filter.active_values -%}
+                  <facet-remove>
+                    <a href="{{ value.url_to_remove }}" class="ww-chip ww-chip--remove">
+                      {{- filter.label | escape }}: {{ value.label | escape -}}
+                      {%- render 'ww-icon', icon: 'close', size: 14, stroke: 2 -%}
+                      <span class="visually-hidden">{{ 'products.facets.clear_filter' | t }}</span>
+                    </a>
+                  </facet-remove>
+                {%- endfor -%}
+              {%- endfor -%}
+            </div>
+          </div>
+
+          {%- if colour_filter -%}
+            <div class="ww-collection__colour-chips" role="group" aria-label="{{ colour_filter.label | escape }}">
+              {%- for value in colour_filter.values -%}
+                {%- assign value_handle = value.value | handleize -%}
+                <facet-remove>
+                  <a
+                    href="{% if value.active %}{{ value.url_to_remove }}{% else %}{{ value.url_to_add }}{% endif %}"
+                    class="ww-chip ww-chip--colour{% if value.active %} is-active{% endif %}"
+                    aria-pressed="{{ value.active }}"
+                  >
+                    <span
+                      class="ww-chip__dot"
+                      style="--ww-dot: var(--ww-swatch-{{ value_handle }}, {{ value.swatch.color | default: 'var(--ww-border-strong)' }});"
+                    ></span>
+                    {{- value.label | escape -}}
+                  </a>
+                </facet-remove>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+          <div class="collection ww-collection__grid-wrap">
+            {%- if collection.products.size == 0 -%}
+              <div id="product-grid" data-id="{{ section.id }}" class="ww-collection__empty">
+                {{ s.empty_text | escape }}
+              </div>
+            {%- else -%}
+              <ul id="product-grid" data-id="{{ section.id }}" class="ww-collection__grid" role="list">
+                {%- for product in collection.products -%}
+                  <li>
+                    {%- liquid
+                      assign lazy = true
+                      if forloop.index <= 3
+                        assign lazy = false
+                      endif
+                    -%}
+                    {%- render 'ww-card-product',
+                      card_product: product,
+                      colour: active_colour,
+                      show_category: true,
+                      show_colour_label: true,
+                      categories: s.category_tags,
+                      badges: s.badges,
+                      lazy: lazy,
+                      sizes: '(min-width: 990px) 287px, (min-width: 750px) 33vw, 50vw'
+                    -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+              {%- if paginate.pages > 1 -%}
+                {% render 'pagination', paginate: paginate, anchor: '' %}
+              {%- endif -%}
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    {%- endpaginate -%}
+  </ww-collection>
+</collection-component>
+
+{% schema %}
+{
+  "name": "WW: Collection grid",
+  "tag": "div",
+  "class": "section-ww-main-collection",
+  "enabled_on": { "templates": ["collection"] },
+  "settings": [
+    { "type": "range", "id": "products_per_page", "label": "Products per page", "min": 6, "max": 36, "step": 3, "default": 24 },
+    { "type": "checkbox", "id": "enable_filtering", "label": "Enable filtering", "info": "Filters come from the Search & Discovery app.", "default": true },
+    { "type": "checkbox", "id": "enable_sorting", "label": "Enable sorting", "default": true },
+    {
+      "type": "text",
+      "id": "category_tags",
+      "label": "Category tags",
+      "info": "Tags shown in a tag filter and used as the card category, in this order.",
+      "default": "backpacks, travel, totes, accessories"
+    },
+    { "type": "text", "id": "in_stock_label", "label": "Availability checkbox label", "default": "In stock only" },
+    { "type": "text", "id": "featured_label", "label": "Label for the 'Featured' sort option", "default": "Featured" },
+    { "type": "text", "id": "sort_prefix_mobile", "label": "Sort prefix on mobile", "default": "Sort:" },
+    { "type": "text", "id": "count_label", "label": "Product count", "info": "[count] is replaced by the number.", "default": "[count] products" },
+    { "type": "text", "id": "count_label_mobile", "label": "Product count on mobile", "default": "[count] items" },
+    { "type": "text", "id": "empty_text", "label": "No results text", "default": "No products match these filters." },
+    {
+      "type": "text",
+      "id": "badges",
+      "label": "Badges from tags",
+      "info": "tag:Label pairs, comma separated.",
+      "default": "bestseller:Bestseller, new:New"
+    }
+  ]
+}
+{% endschema %}

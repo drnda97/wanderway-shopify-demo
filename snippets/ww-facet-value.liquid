@@ -1,0 +1,56 @@
+{%- comment -%}
+  Wander Way demo – one filter value (checkbox row) for ww-facets.
+
+  Accepts:
+  - filter: {Object} the filter (required)
+  - value: {Object} the filter value (required)
+  - index: {Number} position, used for a stable input id (required)
+  - label: {String} visible label (defaults to value.label)
+  - colour: {Boolean} render as a colour row with a dot
+  - hide_count: {Boolean} hide the product count
+{%- endcomment -%}
+{%- liquid
+  assign input_id = 'Filter-' | append: filter.param_name | escape | append: '-' | append: index
+  assign label = label | default: value.label
+  assign is_disabled = false
+  if value.count == 0 and value.active == false
+    assign is_disabled = true
+  endif
+  assign value_handle = value.value | handleize
+-%}
+<li class="ww-facet__item">
+  <label
+    for="{{ input_id }}"
+    class="ww-facet__option{% if colour %} ww-facet__option--colour{% endif %}{% if value.active %} is-active{% endif %}{% if is_disabled %} is-disabled{% endif %}"
+  >
+    <input
+      type="checkbox"
+      class="ww-facet__checkbox{% if colour %} visually-hidden{% endif %}"
+      name="{{ value.param_name }}"
+      value="{{ value.value }}"
+      id="{{ input_id }}"
+      {% if value.active %}
+        checked
+      {% endif %}
+      {% if is_disabled %}
+        disabled
+      {% endif %}
+    >
+    {%- if colour -%}
+      <span
+        class="ww-facet__dot"
+        style="--ww-dot: var(--ww-swatch-{{ value_handle }}, {{ value.swatch.color | default: 'var(--ww-border-strong)' }});"
+        aria-hidden="true"
+      ></span>
+    {%- endif -%}
+    <span class="ww-facet__label">{{ label | escape }}</span>
+    {%- unless hide_count -%}
+      <span class="ww-facet__count">
+        <span aria-hidden="true">{{ value.count }}</span>
+        <span class="visually-hidden">
+          ({{- 'products.facets.product_count_simple' | t: count: value.count -}})
+        </span>
+      </span>
+    {%- endunless -%}
+  </label>
+</li>

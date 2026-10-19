@@ -1,0 +1,81 @@
+{%- comment -%}
+  Wander Way demo – collection banner: breadcrumb, H1 (italic last word),
+  intro aligned to the bottom right.
+  The heading/intro settings apply to the collection named in "Use custom copy
+  on" (default: all). Every other collection shows its own title (last word
+  italic) and description.
+{%- endcomment -%}
+{{ 'ww-collection.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign s = section.settings
+  assign custom_handles = s.custom_handles | remove: ' ' | split: ','
+  assign use_custom = false
+  if custom_handles contains collection.handle
+    assign use_custom = true
+  endif
+
+  if use_custom
+    assign breadcrumb = s.breadcrumb_label | default: collection.title
+    assign heading = s.heading
+    assign heading_italic = s.heading_italic
+    assign intro = s.intro
+    assign intro_mobile = s.intro_mobile | default: s.intro
+  else
+    assign breadcrumb = collection.title
+    assign words = collection.title | split: ' '
+    assign heading_italic = words | last
+    assign heading = collection.title | remove_last: heading_italic | strip
+    assign intro = collection.description | strip_html | strip
+    assign intro_mobile = intro
+  endif
+-%}
+
+<section class="ww-collection-banner ww-scope page-width">
+  <nav class="ww-breadcrumb" aria-label="Breadcrumb">
+    <a href="{{ routes.root_url }}">{{ s.home_label | escape }}</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{{ breadcrumb | escape }}</span>
+  </nav>
+  <div class="ww-collection-banner__row">
+    <h1 class="ww-h1 ww-collection-banner__heading">
+      {{- heading | escape }}
+      {% if heading_italic != blank %}<em>{{ heading_italic | escape }}</em>{% endif -%}
+    </h1>
+    {%- if intro != blank -%}
+      <p class="ww-collection-banner__intro">
+        <span class="ww-collection-banner__desktop-copy">{{ intro | escape }}</span>
+        <span class="ww-collection-banner__mobile-copy">{{ intro_mobile | escape }}</span>
+      </p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "WW: Collection banner",
+  "tag": "div",
+  "class": "section-ww-collection-banner",
+  "enabled_on": { "templates": ["collection"] },
+  "settings": [
+    { "type": "text", "id": "home_label", "label": "Breadcrumb home label", "default": "Home" },
+    {
+      "type": "text",
+      "id": "custom_handles",
+      "label": "Use custom copy on",
+      "info": "Collection handles, comma separated. Others show their own title and description.",
+      "default": "all"
+    },
+    { "type": "text", "id": "breadcrumb_label", "label": "Breadcrumb label", "default": "Shop all" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Everything you need to" },
+    { "type": "text", "id": "heading_italic", "label": "Italic last word", "default": "go." },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Intro",
+      "default": "Backpacks, weekenders and the small things that keep a trip organised. Every piece in Black, Sand and Olive."
+    },
+    { "type": "textarea", "id": "intro_mobile", "label": "Intro on mobile", "default": "Every piece in Black, Sand and Olive." }
+  ]
+}
+{% endschema %}
