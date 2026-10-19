@@ -2,3 +2,29 @@ MatchingTranslations:
   enabled: false
 TemplateLength:
   enabled: false
+
+# Handoff package (design reference, data) is not part of the theme.
+ignore:
+  - wanderway-demo-handoff/**
+
+# Warnings below come from unmodified Dawn 16.0.0 files. They are scoped to
+# those files instead of editing upstream code, so the theme stays upgradable.
+VariableName:
+  ignore:
+    - sections/main-list-collections.liquid # moduloResult
+    - sections/main-article.liquid # anchorId
+UnusedAssign:
+  ignore:
+    - sections/main-search.liquid # product_settings
+    - sections/main-product.liquid # seo_media
+LiquidComplexity:
+  ignore:
+    - snippets/facets.liquid
+OrphanedSnippet:
+  ignore:
+    - snippets/quick-order-product-row.liquid
+UndefinedObject:
+  ignore:
+    - sections/main-product.liquid # false positive: `offset: continue` is valid Liquid
+    - layout/theme.liquid # scheme_classes is built up with append inside the loop
+    - layout/password.liquid # same pattern as theme.liquid
