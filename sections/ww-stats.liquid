@@ -1,0 +1,40 @@
+{%- comment -%}
+  Wander Way demo – "at a glance" stats row (2×2 card on mobile).
+{%- endcomment -%}
+{{ 'ww-product.css' | asset_url | stylesheet_tag }}
+
+<section class="ww-stats ww-section ww-scope page-width" aria-label="{{ section.settings.label | escape }}">
+  <dl class="ww-stats__grid">
+    {%- for block in section.blocks -%}
+      <div class="ww-stats__cell" {{ block.shopify_attributes }}>
+        <dt class="ww-stats__label">
+          <span class="ww-stats__desktop-copy">{{ block.settings.label | escape }}</span>
+          <span class="ww-stats__mobile-copy">{{ block.settings.label_mobile | default: block.settings.label | escape }}</span>
+        </dt>
+        <dd class="ww-stats__value">{{ block.settings.value | escape }}</dd>
+      </div>
+    {%- endfor -%}
+  </dl>
+</section>
+
+{% schema %}
+{
+  "name": "WW: Stats",
+  "tag": "div",
+  "class": "section-ww-stats",
+  "max_blocks": 4,
+  "settings": [{ "type": "text", "id": "label", "label": "Accessible name", "default": "At a glance" }],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Stat",
+      "settings": [
+        { "type": "text", "id": "value", "label": "Value", "default": "22L" },
+        { "type": "text", "id": "label", "label": "Label", "default": "Carry-on friendly volume" },
+        { "type": "text", "id": "label_mobile", "label": "Label on mobile", "info": "Optional shorter version." }
+      ]
+    }
+  ],
+  "presets": [{ "name": "WW: Stats", "blocks": [{ "type": "stat" }, { "type": "stat" }, { "type": "stat" }, { "type": "stat" }] }]
+}
+{% endschema %}

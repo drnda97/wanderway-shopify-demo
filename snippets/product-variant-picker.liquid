@@ -50,8 +50,18 @@
           %}
         </fieldset>
       {%- elsif picker_type == 'button' -%}
+        {%- liquid
+          assign option_label = option.name
+          assign option_name = option.name | downcase
+          if option_name == 'color' and block.settings.ww_colour_label != blank
+            assign option_label = block.settings.ww_colour_label
+          endif
+        -%}
         <fieldset class="js product-form__input product-form__input--pill">
-          <legend class="form__label">{{ option.name }}</legend>
+          <legend class="form__label">
+            <span class="ww-option-name">{{ option_label | escape }}:</span>
+            <span class="ww-option-value">{{ option.selected_value | escape }}</span>
+          </legend>
           {% render 'product-variant-options',
             product: product,
             option: option,

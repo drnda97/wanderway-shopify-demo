@@ -1,150 +1,95 @@
 /**
- * Wander Way demo - <ww-delivery-estimate>
- * Business-day delivery window, cut-off countdown and free-shipping progress.
+ * Wander Way demo – <ww-delivery-estimate>
+ * Zone picker (remembered in localStorage), arrival window in business days
+ * from today's dispatch (or the next business day after the cut-off), and the
+ * free-shipping bar fed by /cart.js, refreshed on PUB_SUB_EVENTS.cartUpdate.
+ * Needs ww-shipping.js.
  */
 if (!customElements.get('ww-delivery-estimate')) {
   customElements.define(
     'ww-delivery-estimate',
     class WWDeliveryEstimate extends HTMLElement {
       connectedCallback() {
-        this.select = this.querySelector('select');
-        this.threshold = parseInt(this.dataset.threshold, 10) || 0;
-        this.price = parseInt(this.dataset.price, 10) || 0;
-        this.cutoffHour = parseInt(this.dataset.cutoffHour, 10);
-        this.processingDays = parseInt(this.dataset.processingDays, 10) || 0;
-        this.locale = this.dataset.locale || undefined;
-        this.moneyFormat = this.dataset.moneyFormat || '{{amount}}';
-        this.dateFormat = new Intl.DateTimeFormat(this.locale, { weekday: 'short', day: 'numeric', month: 'short' });
+        this.zones = WWShipping.parseZones(this.dataset.zones);
+        this.select = this.querySelector('[data-ww-zone]');
+        if (!this.zones.length || !this.select) return;
 
-        this.select.addEventListener('change', () => this.render());
+        this.select.selectedIndex = WWShipping.getZoneIndex(this.zones);
+        this.select.addEventListener('change', () => {
+          WWShipping.saveZone(this.zone);
+          this.renderZone();
+        });
+        this.renderZone();
+        this.timer = window.setInterval(() => this.renderZone(), 60 * 1000);
 
         if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined') {
-          this.unsubscribe = subscribe(PUB_SUB_EVENTS.variantChange, (event) => {
-            const variant = event && event.data && event.data.variant;
-            if (!variant) return;
-            this.price = variant.price;
-            this.render();
-          });
+          this.unsubscribe = subscribe(PUB_SUB_EVENTS.cartUpdate, () => this.refreshCart());
         }
-
-        this.render();
-        this.timer = setInterval(() => this.renderCutoff(), 60 * 1000);
       }
 
       disconnectedCallback() {
-        if (this.unsubscribe) this.unsubscribe();
-        clearInterval(this.timer);
+        window.clearInterval(this.timer);
+        this.unsubscribe?.();
       }
 
       get zone() {
-        const option = this.select.options[this.select.selectedIndex];
-        return {
-          rate: parseInt(option.dataset.rate, 10) || 0,
-          min: parseInt(option.dataset.min, 10) || 1,
-          max: parseInt(option.dataset.max, 10) || 1,
-        };
+        return this.zones[this.select.selectedIndex] || this.zones[0];
       }
 
-      render() {
+      renderZone() {
         const zone = this.zone;
-        const freeShipping = this.threshold > 0 && this.price >= this.threshold;
-
-        const dispatch = this.dispatchDate(new Date());
-        const from = this.addBusinessDays(dispatch, zone.min);
-        const to = this.addBusinessDays(dispatch, Math.max(zone.max, zone.min));
-        this.querySelector('[data-ww-window]').textContent =
+        const { dispatch } = WWShipping.dispatch(this.dataset.timezone, Number(this.dataset.cutoffHour));
+        const from = WWShipping.addBusinessDays(dispatch, zone.min);
+        const to = WWShipping.addBusinessDays(dispatch, zone.max);
+        const locale = this.dataset.locale;
+        const arrival =
           zone.min === zone.max
-            ? this.dateFormat.format(from)
-            : `${this.dateFormat.format(from)} – ${this.dateFormat.format(to)}`;
+            ? WWShipping.formatDate(from, locale)
+            : `${WWShipping.formatDate(from, locale)} – ${WWShipping.formatDate(to, locale)}`;
 
-        this.querySelector('[data-ww-rate]').textContent =
-          freeShipping || zone.rate === 0 ? this.freeWord() : this.formatMoney(zone.rate);
-
-        this.renderFreeShipping();
-        this.renderCutoff();
+        this.querySelector('[data-ww-arrival]').textContent = arrival;
+        this.querySelector('[data-ww-days]').textContent = (this.dataset.days || '')
+          .replace('[min]', zone.min)
+          .replace('[max]', zone.max);
+        this.querySelector('[data-ww-price]').textContent = zone.price;
+        this.querySelector('[data-ww-carrier]').textContent = zone.carrier;
       }
 
-      renderFreeShipping() {
-        const text = this.querySelector('[data-ww-free-text]');
-        if (!text || this.threshold <= 0) return;
-        const bar = this.querySelector('[data-ww-bar]');
-        const fill = this.querySelector('[data-ww-bar-fill]');
-        const pct = Math.min(100, Math.round((this.price / this.threshold) * 100));
-
-        text.textContent =
-          this.price >= this.threshold
-            ? 'This item ships free.'
-            : `Add ${this.formatMoney(this.threshold - this.price)} more for free shipping.`;
-        fill.style.width = `${pct}%`;
-        bar.setAttribute('aria-valuenow', pct);
-        bar.classList.toggle('is-complete', pct >= 100);
+      /** Re-read the cart total; the progress markup is rendered by Liquid on load. */
+      async refreshCart() {
+        const free = this.querySelector('[data-ww-free-shipping]');
+        if (!free) return;
+        try {
+          const response = await fetch(`${window.routes?.cart_url || '/cart'}.js`, { headers: { Accept: 'application/json' } });
+          const cart = await response.json();
+          this.renderFreeShipping(free, cart.total_price);
+        } catch (error) {
+          /* keep the last rendered state */
+        }
       }
 
-      renderCutoff() {
-        const el = this.querySelector('[data-ww-cutoff]');
-        const now = new Date();
-        const cutoff = new Date(now);
-        cutoff.setHours(this.cutoffHour, 0, 0, 0);
+      renderFreeShipping(free, total) {
+        const rate = Number(window.Shopify?.currency?.rate) || 1;
+        const threshold = Math.round(Number(free.dataset.threshold) * rate);
+        const format = this.dataset.moneyFormat;
+        const unlocked = total >= threshold;
+        const percent = Math.min(100, Math.round((total / threshold) * 100));
 
-        if (this.isBusinessDay(now) && now < cutoff && this.processingDays === 0) {
-          const mins = Math.ceil((cutoff - now) / 60000);
-          const h = Math.floor(mins / 60);
-          const m = mins % 60;
-          el.textContent = `Order within ${h ? `${h}h ` : ''}${m}m to ship today.`;
-          el.hidden = false;
+        free.classList.toggle('is-unlocked', unlocked);
+        const text = free.querySelector('[data-ww-free-text]');
+        if (unlocked) {
+          text.textContent = free.dataset.unlockedText;
         } else {
-          el.hidden = true;
+          const [before, after = ''] = free.dataset.remainingText.split('[amount]');
+          const strong = document.createElement('strong');
+          strong.textContent = WWShipping.formatMoney(threshold - total, format);
+          text.replaceChildren(before, strong, after);
         }
-      }
-
-      dispatchDate(now) {
-        let date = new Date(now);
-        const afterCutoff = now.getHours() >= this.cutoffHour;
-        if (!this.isBusinessDay(date) || afterCutoff) date = this.addBusinessDays(date, 1);
-        return this.addBusinessDays(date, this.processingDays);
-      }
-
-      addBusinessDays(start, days) {
-        const date = new Date(start);
-        let added = 0;
-        while (added < days) {
-          date.setDate(date.getDate() + 1);
-          if (this.isBusinessDay(date)) added += 1;
-        }
-        while (!this.isBusinessDay(date)) date.setDate(date.getDate() + 1);
-        return date;
-      }
-
-      isBusinessDay(date) {
-        const day = date.getDay();
-        return day !== 0 && day !== 6;
-      }
-
-      freeWord() {
-        return window.variantStrings && window.variantStrings.free ? window.variantStrings.free : 'Free';
-      }
-
-      formatMoney(cents) {
-        const value = cents / 100;
-        const fmt = (decimals, thousands, decimal) => {
-          const parts = value.toFixed(decimals).split('.');
-          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousands);
-          return parts.join(decimal);
-        };
-        return this.moneyFormat.replace(/\{\{\s*(\w+)\s*\}\}/, (_, key) => {
-          switch (key) {
-            case 'amount_no_decimals':
-              return fmt(0, ',', '.');
-            case 'amount_with_comma_separator':
-              return fmt(2, '.', ',');
-            case 'amount_no_decimals_with_comma_separator':
-              return fmt(0, '.', ',');
-            case 'amount_with_apostrophe_separator':
-              return fmt(2, "'", '.');
-            default:
-              return fmt(2, ',', '.');
-          }
-        });
+        free.querySelector('[data-ww-free-amount]').textContent = `${WWShipping.formatMoney(total, format)} / ${WWShipping.formatMoney(threshold, format)}`;
+        const bar = free.querySelector('[data-ww-free-bar]');
+        bar.setAttribute('aria-valuenow', String(Math.min(total, threshold) / 100));
+        bar.setAttribute('aria-valuemax', String(threshold / 100));
+        free.querySelector('[data-ww-free-fill]').style.width = `${percent}%`;
       }
     }
   );

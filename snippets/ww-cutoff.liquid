@@ -1,0 +1,21 @@
+{%- comment -%}
+  Wander Way demo – dispatch countdown line ("Order within 2h 15m to ship
+  today"). Text, cut-off hour and timezone come from Theme settings →
+  Wander Way demo. Needs ww-shipping.js.
+
+  Accepts:
+  - class: {String} extra class
+  - icon_size: {Number} clock icon size (default 18)
+{%- endcomment -%}
+{%- assign icon_size = icon_size | default: 18 -%}
+<ww-cutoff
+  class="ww-cutoff{% if class %} {{ class }}{% endif %}"
+  data-timezone="{{ settings.ww_timezone | default: 'Europe/Belgrade' | escape }}"
+  data-cutoff-hour="{{ settings.ww_cutoff_hour }}"
+  data-today="{{ settings.ww_cutoff_today_text | escape }}"
+  data-later="{{ settings.ww_cutoff_later_text | escape }}"
+  hidden
+>
+  {%- render 'ww-icon', icon: 'clock', size: icon_size, stroke: 1.8 -%}
+  <span data-ww-cutoff-text></span>
+</ww-cutoff>

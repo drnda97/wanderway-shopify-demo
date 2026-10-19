@@ -1486,6 +1486,25 @@
         "default": 150
       },
       {
+        "type": "text",
+        "id": "ww_free_remaining_text",
+        "label": "Progress text",
+        "info": "[amount] is replaced by the amount left.",
+        "default": "Add [amount] more for free shipping"
+      },
+      {
+        "type": "text",
+        "id": "ww_free_unlocked_text",
+        "label": "Unlocked text",
+        "default": "You’ve unlocked free shipping"
+      },
+      {
+        "type": "text",
+        "id": "ww_free_progress_label",
+        "label": "Progress bar label (screen readers)",
+        "default": "Progress to free shipping"
+      },
+      {
         "type": "product",
         "id": "ww_cart_upsell",
         "label": "Cart drawer upsell product",
@@ -1517,6 +1536,19 @@
         "label": "Store timezone (IANA)",
         "info": "Used for the cut-off countdown, e.g. Europe/Belgrade.",
         "default": "Europe/Belgrade"
+      },
+      {
+        "type": "text",
+        "id": "ww_cutoff_today_text",
+        "label": "Countdown text",
+        "info": "[time] is replaced by the time left, e.g. 2h 15m.",
+        "default": "Order within [time] to ship today"
+      },
+      {
+        "type": "text",
+        "id": "ww_cutoff_later_text",
+        "label": "After cut-off text",
+        "default": "Ships next business day"
       },
       {
         "type": "textarea",

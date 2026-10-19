@@ -1,0 +1,60 @@
+{%- comment -%}
+  Wander Way demo – free-shipping progress (text, mono amount, 8px bar).
+  Server-rendered from the cart, so the cart drawer is right after every
+  re-render; the delivery estimate refreshes it client-side from /cart.js.
+
+  Texts and threshold come from Theme settings → Wander Way demo.
+
+  Accepts:
+  - total: {Number} cart total in cents (default cart.total_price)
+
+  Usage:
+  {% render 'ww-free-shipping' %}
+{%- endcomment -%}
+{%- liquid
+  assign total = total | default: cart.total_price
+  assign threshold = settings.ww_free_shipping_threshold | times: 100
+  assign remaining = threshold | minus: total | at_least: 0
+  assign unlocked = false
+  if total >= threshold
+    assign unlocked = true
+  endif
+  assign percent = total | times: 100 | divided_by: threshold | at_most: 100
+  assign remaining_text = settings.ww_free_remaining_text
+  assign unlocked_text = settings.ww_free_unlocked_text
+  assign remaining_money = remaining | money_without_trailing_zeros
+  assign remaining_html = '<strong data-ww-free-remaining>' | append: remaining_money | append: '</strong>'
+-%}
+{%- if threshold > 0 -%}
+  <div
+    class="ww-free-shipping{% if unlocked %} is-unlocked{% endif %}"
+    data-ww-free-shipping
+    data-threshold="{{ threshold }}"
+    data-remaining-text="{{ remaining_text | escape }}"
+    data-unlocked-text="{{ unlocked_text | escape }}"
+  >
+    <div class="ww-free-shipping__row">
+      <span class="ww-free-shipping__text" data-ww-free-text>
+        {%- if unlocked -%}
+          {{ unlocked_text | escape }}
+        {%- else -%}
+          {{ remaining_text | escape | replace: '[amount]', remaining_html }}
+        {%- endif -%}
+      </span>
+      <span class="ww-free-shipping__amount" data-ww-free-amount>
+        {{- total | money_without_trailing_zeros }} / {{ threshold | money_without_trailing_zeros -}}
+      </span>
+    </div>
+    <div
+      class="ww-free-shipping__bar"
+      role="progressbar"
+      aria-label="{{ settings.ww_free_progress_label | escape }}"
+      aria-valuemin="0"
+      aria-valuemax="{{ settings.ww_free_shipping_threshold }}"
+      aria-valuenow="{{ total | divided_by: 100 | at_most: settings.ww_free_shipping_threshold }}"
+      data-ww-free-bar
+    >
+      <span style="width: {{ percent }}%;" data-ww-free-fill></span>
+    </div>
+  </div>
+{%- endif -%}

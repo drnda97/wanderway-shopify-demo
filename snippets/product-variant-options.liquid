@@ -95,7 +95,13 @@
       {% endif %}
       {{ input_dataset }}
     >
-    <label for="{{ input_id }}">
+    {%- assign option_name = option.name | downcase -%}
+    <label
+      for="{{ input_id }}"
+      {% if option_name == 'color' or option_name == 'colour' %}
+        class="ww-pill-dot" style="--ww-dot: var(--ww-swatch-{{ value | handleize }}, {{ value.swatch.color | default: 'var(--ww-border-strong)' }});"
+      {% endif %}
+    >
       {{ value -}}
       {{ label_unavailable }}
     </label>

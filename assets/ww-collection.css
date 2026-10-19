@@ -9,24 +9,6 @@
   padding-bottom: 40px;
 }
 
-.ww-breadcrumb {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--ww-ink-3);
-}
-
-.ww-breadcrumb a {
-  color: var(--ww-ink-3);
-  text-decoration: none;
-}
-
-.ww-breadcrumb a:hover {
-  color: var(--ww-ink);
-}
-
 .ww-collection-banner__row {
   display: flex;
   justify-content: space-between;
@@ -604,10 +586,6 @@
   .ww-collection-banner__heading {
     font-size: 40px;
     line-height: 1.04;
-  }
-
-  .ww-breadcrumb {
-    font-size: 13.5px;
   }
 
   .ww-collection-banner__intro {

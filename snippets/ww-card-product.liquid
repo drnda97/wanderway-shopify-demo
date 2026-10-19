@@ -13,6 +13,7 @@
   - badges: {String} "tag:Label" pairs, comma separated. Default "bestseller:Bestseller, new:New"
   - categories: {String} tags used as the category label, comma separated
     (first match wins, falls back to the product type)
+  - simple: {Boolean} image + title/price only (no badge, meta or swatches)
   - lazy: {Boolean} lazy-load the image (default true)
   - sizes: {String} image sizes attribute
 
@@ -111,6 +112,13 @@
     assign price_label = p.price | money_without_trailing_zeros
   endif
 
+  assign show_meta = false
+  if simple != true
+    if current_colour or show_category
+      assign show_meta = true
+    endif
+  endif
+
   assign title = p.title | escape
   assign alt = title
   if current_colour
@@ -118,7 +126,7 @@
   endif
 -%}
 <ww-card-swatches
-  class="ww-card"
+  class="ww-card{% if simple %} ww-card--simple{% endif %}"
   style="--ww-card-tint: var(--ww-tint-{{ colour_handle }}, var(--ww-surface-2));"
 >
   <a
@@ -143,7 +151,7 @@
     {%- else -%}
       {{ 'product-apparel-1' | placeholder_svg_tag: 'ww-card__img ww-card__img--placeholder' }}
     {%- endif -%}
-    {%- if badge_label != '' -%}
+    {%- if badge_label != '' and simple != true -%}
       <span class="ww-badge ww-card__badge">{{ badge_label }}</span>
     {%- endif -%}
     {%- if show_colour_label and current_colour -%}
@@ -157,7 +165,7 @@
   <div class="ww-card__info">
     <a href="{{ current_variant.url | default: p.url }}" class="ww-card__title" data-ww-card-link>{{ title }}</a>
     <span class="ww-card__price">{{ price_label }}</span>
-    {%- if current_colour or show_category -%}
+    {%- if show_meta -%}
       <span class="ww-card__meta">
         {%- if current_colour -%}<span data-ww-card-colour>{{ current_colour | escape }}</span>{%- endif -%}
         {%- if show_category and category != blank -%}
@@ -168,7 +176,7 @@
     {%- endif -%}
   </div>
 
-  {%- if colour_option and colour_option.values.size > 1 -%}
+  {%- if simple != true and colour_option and colour_option.values.size > 1 -%}
     <div class="ww-card__swatches" role="group" aria-label="{{ colour_option.name | escape }}">
       {%- for value in colour_option.values -%}
         {%- liquid

@@ -1,177 +1,320 @@
 {
   "sections": {
+    "breadcrumb": {
+      "type": "ww-breadcrumb",
+      "settings": {
+        "home_label": "Home",
+        "category_tags": "backpacks, travel, totes, accessories"
+      }
+    },
     "main": {
       "type": "main-product",
       "blocks": {
-        "vendor": {
-          "type": "text",
+        "heading": {
+          "type": "ww_heading",
           "settings": {
-            "text": "{{ product.vendor }}",
-            "text_style": "uppercase"
+            "badges": "bestseller:Bestseller, new:New",
+            "rating_text": "4.8 · 126 sample reviews",
+            "rating_link": "#reviews",
+            "italic_last_word": true,
+            "price_note": "Tax included. Demo store – checkout is disabled.",
+            "price_note_mobile": "Tax included · Demo checkout",
+            "show_description": true,
+            "atc_separator": " · "
           }
-        },
-        "title": {
-          "type": "title"
-        },
-        "price": {
-          "type": "price"
         },
         "variant_picker": {
           "type": "variant_picker",
           "settings": {
             "picker_type": "button",
-            "swatch_shape": "circle"
+            "swatch_shape": "circle",
+            "ww_colour_label": "Colour"
           }
         },
         "quantity_selector": {
-          "type": "quantity_selector"
+          "type": "quantity_selector",
+          "settings": {}
         },
         "buy_buttons": {
           "type": "buy_buttons",
           "settings": {
             "show_dynamic_checkout": true,
-            "show_gift_card_recipient": true
+            "show_gift_card_recipient": false
           }
         },
-        "description": {
-          "type": "description"
-        },
-        "share": {
-          "type": "share",
+        "stock": {
+          "type": "ww_stock",
           "settings": {
-            "share_label": "Share"
+            "in_stock_text": "In stock in [colour], ready to ship",
+            "sold_out_text": "Sold out in [colour]"
+          }
+        },
+        "delivery": {
+          "type": "ww_delivery_estimate",
+          "settings": {
+            "heading": "Delivery estimate",
+            "tag": "Custom section",
+            "zone_label": "Ship to",
+            "zones": "Serbia|1|2|€4.90|Local courier\nEuropean Union|3|5|€9.90|Tracked, DDP\nUnited Kingdom|4|6|€14.90|Tracked, duties paid\nRest of world|6|10|€24.90|Express, tracked",
+            "arrival_label": "Estimated arrival",
+            "days_text": "[min]–[max] business days",
+            "shipping_label": "Shipping"
+          }
+        },
+        "details": {
+          "type": "ww_accordion",
+          "settings": {
+            "heading": "Details",
+            "source": "description_details",
+            "content": "",
+            "open": true
+          }
+        },
+        "materials": {
+          "type": "ww_accordion",
+          "settings": {
+            "heading": "Materials & care",
+            "source": "setting",
+            "content": "<p>Recycled nylon shell with a water-resistant coating. Wipe clean with a damp cloth.</p>",
+            "open": false
+          }
+        },
+        "shipping": {
+          "type": "ww_accordion",
+          "settings": {
+            "heading": "Shipping & returns",
+            "source": "setting",
+            "content": "<p>Free shipping over €150. Free returns within 30 days. This is a demo store, so nothing actually ships.</p>",
+            "open": false
+          }
+        },
+        "sticky": {
+          "type": "ww_sticky_atc",
+          "settings": {
+            "short_title": "Daypack",
+            "button_label": "Add to cart"
           }
         }
       },
       "block_order": [
-        "vendor",
-        "title",
-        "price",
+        "heading",
         "variant_picker",
         "quantity_selector",
         "buy_buttons",
-        "description",
-        "share"
+        "stock",
+        "delivery",
+        "details",
+        "materials",
+        "shipping",
+        "sticky"
       ],
       "settings": {
-        "enable_sticky_info": true,
+        "enable_sticky_info": false,
         "color_scheme": "scheme-1",
-        "media_position": "left",
-        "gallery_layout": "stacked",
         "media_size": "large",
-        "constrain_to_viewport": true,
-        "media_fit": "contain",
-        "image_zoom": "lightbox",
+        "constrain_to_viewport": false,
+        "media_fit": "cover",
+        "gallery_layout": "thumbnail",
+        "media_position": "left",
+        "image_zoom": "none",
         "mobile_thumbnails": "hide",
         "hide_variants": true,
         "enable_video_looping": false,
-        "padding_top": 36,
-        "padding_bottom": 12
-      }
-    },
-    "disclosures": {
-      "type": "disclosures",
-      "settings": {
-        "padding_top": 36,
+        "padding_top": 0,
         "padding_bottom": 0
       }
     },
-    "related-products": {
-      "type": "related-products",
-      "settings": {
-        "heading": "You may also like",
-        "heading_size": "h2",
-        "products_to_show": 4,
-        "columns_desktop": 4,
-        "color_scheme": "scheme-1",
-        "image_ratio": "square",
-        "image_shape": "default",
-        "show_secondary_image": true,
-        "show_vendor": false,
-        "show_rating": false,
-        "columns_mobile": "2",
-        "padding_top": 36,
-        "padding_bottom": 28
-      }
-    },
-    "ww_delivery": {
-      "type": "ww-delivery-estimate",
+    "colour_story": {
+      "type": "ww-colour-story",
       "blocks": {
-        "eu": {
-          "type": "zone",
+        "colour_black": {
+          "type": "colour",
           "settings": {
-            "zone_name": "Europe",
-            "countries": "DE,AT,CH,NL,BE,FR,IT,ES,DK,SE,RS",
-            "rate": 6,
-            "min_days": 2,
-            "max_days": 4
+            "option_value": "Black",
+            "fallback_image": "daypack-black.jpg",
+            "label": "No. 01 — Black",
+            "heading": "Black, for",
+            "heading_italic": "everywhere.",
+            "text": "The one that goes from airport lounge to client meeting without a second thought. Matte recycled nylon hides scuffs, and gunmetal zips keep it quiet.",
+            "finish": "Matte nylon",
+            "hardware": "Gunmetal",
+            "pairs_with": "Anything",
+            "image_position": "50% 60%"
           }
         },
-        "uk": {
-          "type": "zone",
+        "colour_sand": {
+          "type": "colour",
           "settings": {
-            "zone_name": "United Kingdom",
-            "countries": "GB",
-            "rate": 9,
-            "min_days": 3,
-            "max_days": 6
+            "option_value": "Sand",
+            "fallback_image": "daypack-sand.jpg",
+            "label": "No. 02 — Sand",
+            "heading": "Sand, for slow",
+            "heading_italic": "mornings.",
+            "text": "Warm and light, like the first coffee on a terrace. A water-resistant coating keeps it clean on the road, and brushed brass pulls add a little warmth.",
+            "finish": "Coated canvas",
+            "hardware": "Brushed brass",
+            "pairs_with": "Linen, denim",
+            "image_position": "50% 35%"
           }
         },
-        "row": {
-          "type": "zone",
+        "colour_olive": {
+          "type": "colour",
           "settings": {
-            "zone_name": "Rest of world",
-            "countries": "",
-            "rate": 15,
-            "min_days": 6,
-            "max_days": 12
+            "option_value": "Olive",
+            "fallback_image": "daypack-olive.jpg",
+            "label": "No. 03 — Olive",
+            "heading": "Olive, for the long way",
+            "heading_italic": "round.",
+            "text": "Trail-ready and a little rugged. The deep green softens with every trip, and tonal stitching lets the shape do the talking.",
+            "finish": "Washed nylon",
+            "hardware": "Matte black",
+            "pairs_with": "Earth tones",
+            "image_position": "50% 50%"
           }
         }
       },
       "block_order": [
-        "eu",
-        "uk",
-        "row"
+        "colour_black",
+        "colour_sand",
+        "colour_olive"
       ],
       "settings": {
-        "heading": "Delivery & shipping",
-        "free_shipping_threshold": 80,
-        "processing_days": 0,
-        "cutoff_hour": 14
+        "eyebrow": "Colour story · Custom section",
+        "finish_label": "Finish",
+        "hardware_label": "Hardware",
+        "pairs_label": "Pairs with",
+        "swatches_label": "Choose colour"
       }
     },
-    "ww_color_story": {
-      "type": "ww-color-story",
+    "stats": {
+      "type": "ww-stats",
       "blocks": {
-        "c1": {
-          "type": "color_panel",
+        "stat_1": {
+          "type": "stat",
           "settings": {
-            "color_name": "Black",
-            "heading": "Made for late evenings"
+            "value": "22L",
+            "label": "Carry-on friendly volume",
+            "label_mobile": "Carry-on friendly"
           }
         },
-        "c2": {
-          "type": "color_panel",
+        "stat_2": {
+          "type": "stat",
           "settings": {
-            "color_name": "White",
-            "heading": "Light, clean, everyday"
+            "value": "14\"",
+            "label": "Padded laptop sleeve",
+            "label_mobile": "Laptop sleeve"
+          }
+        },
+        "stat_3": {
+          "type": "stat",
+          "settings": {
+            "value": "0.9 kg",
+            "label": "Light enough to forget",
+            "label_mobile": "Light to carry"
+          }
+        },
+        "stat_4": {
+          "type": "stat",
+          "settings": {
+            "value": "30 days",
+            "label": "Free returns",
+            "label_mobile": "Free returns"
           }
         }
       },
       "block_order": [
-        "c1",
-        "c2"
+        "stat_1",
+        "stat_2",
+        "stat_3",
+        "stat_4"
+      ],
+      "settings": {}
+    },
+    "reviews": {
+      "type": "ww-testimonials",
+      "blocks": {
+        "review_1": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "quote": "Fits a 14-inch laptop and two days of clothes, and still slides under the seat in front of me.",
+            "reviewer": "Sample reviewer · Ljubljana",
+            "date": "Sep 2026",
+            "product_handle": "",
+            "colour": "Olive"
+          }
+        },
+        "review_2": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "quote": "Straps stay comfortable after a full day of walking, and the zips feel properly solid.",
+            "reviewer": "Sample reviewer · Vienna",
+            "date": "Aug 2026",
+            "product_handle": "",
+            "colour": "Black"
+          }
+        },
+        "review_3": {
+          "type": "review",
+          "settings": {
+            "rating": 4,
+            "quote": "The front pocket is perfectly sized for a passport and phone. I stopped digging through the main bag.",
+            "reviewer": "Sample reviewer · Berlin",
+            "date": "Aug 2026",
+            "product_handle": "",
+            "colour": "Sand"
+          }
+        },
+        "review_4": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "quote": "Bought it in Black, came back for Olive. Looks sharper in person than in the photos.",
+            "reviewer": "Sample reviewer · Budapest",
+            "date": "Jul 2026",
+            "product_handle": "",
+            "colour": "Olive"
+          }
+        }
+      },
+      "block_order": [
+        "review_1",
+        "review_2",
+        "review_3",
+        "review_4"
       ],
       "settings": {
-        "heading": "One product, every mood"
+        "layout": "single",
+        "eyebrow": "Testimonials · Custom section",
+        "heading": "Taken the long way",
+        "heading_italic": "round.",
+        "rating_value": "",
+        "rating_label": "",
+        "tag": "Sample review",
+        "verified_label": "Verified demo order",
+        "reviewed_label": "Reviewed product",
+        "prev_label": "Previous testimonial",
+        "next_label": "Next testimonial",
+        "anchor": "reviews"
+      }
+    },
+    "related": {
+      "type": "ww-related-products",
+      "settings": {
+        "heading": "Pairs well",
+        "heading_italic": "with.",
+        "fallback_handles": "essentials-pouch, everyday-tote, overnight-weekender-40l, tech-organiser",
+        "limit": 4
       }
     }
   },
   "order": [
+    "breadcrumb",
     "main",
-    "ww_delivery",
-    "ww_color_story",
-    "disclosures",
-    "related-products"
+    "colour_story",
+    "stats",
+    "reviews",
+    "related"
   ]
 }

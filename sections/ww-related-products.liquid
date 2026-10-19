@@ -1,0 +1,59 @@
+{%- comment -%}
+  Wander Way demo – "Pairs well with." Hand-picked products (product list),
+  falling back to handles so it works right after the CSV import. The
+  current product is skipped.
+{%- endcomment -%}
+{{ 'ww-card.css' | asset_url | stylesheet_tag }}
+{{ 'ww-product.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign s = section.settings
+  assign picks = s.products
+  assign handles = s.fallback_handles | remove: ' ' | split: ','
+  assign rendered = 0
+-%}
+<section class="ww-related ww-section ww-scope page-width{% if s.hide_on_mobile %} ww-related--desktop{% endif %}" aria-labelledby="WWRelatedHeading-{{ section.id }}">
+  <h2 id="WWRelatedHeading-{{ section.id }}" class="ww-h3 ww-related__heading">
+    {{- s.heading | escape }}
+    {% if s.heading_italic != blank %}<em>{{ s.heading_italic | escape }}</em>{% endif -%}
+  </h2>
+  <ul class="ww-related__grid" role="list">
+    {%- if picks != blank and picks.count > 0 -%}
+      {%- for pick in picks -%}
+        {%- if pick.id == product.id or rendered >= s.limit -%}{%- continue -%}{%- endif -%}
+        <li>{%- render 'ww-card-product', card_product: pick, simple: true, sizes: '(min-width: 990px) 304px, 50vw' -%}</li>
+        {%- assign rendered = rendered | plus: 1 -%}
+      {%- endfor -%}
+    {%- else -%}
+      {%- for handle in handles -%}
+        {%- assign pick = all_products[handle] -%}
+        {%- if pick.id == blank or pick.id == product.id or rendered >= s.limit -%}{%- continue -%}{%- endif -%}
+        <li>{%- render 'ww-card-product', card_product: pick, simple: true, sizes: '(min-width: 990px) 304px, 50vw' -%}</li>
+        {%- assign rendered = rendered | plus: 1 -%}
+      {%- endfor -%}
+    {%- endif -%}
+  </ul>
+</section>
+
+{% schema %}
+{
+  "name": "WW: Related products",
+  "tag": "div",
+  "class": "section-ww-related",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Pairs well" },
+    { "type": "text", "id": "heading_italic", "label": "Italic last word", "default": "with." },
+    { "type": "product_list", "id": "products", "label": "Products", "limit": 8 },
+    {
+      "type": "text",
+      "id": "fallback_handles",
+      "label": "Fallback product handles",
+      "info": "Used when no products are picked, comma separated.",
+      "default": "essentials-pouch, everyday-tote, overnight-weekender-40l, tech-organiser"
+    },
+    { "type": "range", "id": "limit", "label": "Products to show", "min": 2, "max": 8, "step": 1, "default": 4 },
+    { "type": "checkbox", "id": "hide_on_mobile", "label": "Hide on mobile", "default": true }
+  ],
+  "presets": [{ "name": "WW: Related products" }]
+}
+{% endschema %}

@@ -1,0 +1,44 @@
+{%- comment -%}
+  Wander Way demo – product breadcrumb: Home / Category / Product.
+  The category is the first product tag found in "Category tags", linking to
+  the collection with that handle.
+{%- endcomment -%}
+{%- liquid
+  assign category = ''
+  assign category_tags = section.settings.category_tags | downcase | split: ','
+  for tag in category_tags
+    assign tag = tag | strip
+    if product.tags contains tag
+      assign category = tag
+      break
+    endif
+  endfor
+-%}
+<nav class="ww-breadcrumb ww-breadcrumb--product page-width" aria-label="Breadcrumb">
+  <a href="{{ routes.root_url }}">{{ section.settings.home_label | escape }}</a>
+  {%- if category != blank -%}
+    <span aria-hidden="true">/</span>
+    <a href="{{ routes.collections_url }}/{{ category }}">{{ category | capitalize | escape }}</a>
+  {%- endif -%}
+  <span aria-hidden="true">/</span>
+  <span aria-current="page">{{ product.title | escape }}</span>
+</nav>
+
+{% schema %}
+{
+  "name": "WW: Breadcrumb",
+  "tag": "div",
+  "class": "section-ww-breadcrumb",
+  "enabled_on": { "templates": ["product"] },
+  "settings": [
+    { "type": "text", "id": "home_label", "label": "Home label", "default": "Home" },
+    {
+      "type": "text",
+      "id": "category_tags",
+      "label": "Category tags",
+      "info": "Comma separated; the first tag the product has becomes the middle crumb.",
+      "default": "backpacks, travel, totes, accessories"
+    }
+  ]
+}
+{% endschema %}

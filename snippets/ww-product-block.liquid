@@ -1,0 +1,222 @@
+{%- comment -%}
+  Wander Way demo – custom blocks of the main-product section.
+  Rendered from sections/main-product.liquid for every block type that
+  starts with "ww_" (schema lives there too).
+
+  - ww_heading: badge + rating link, title (italic last word), price + note,
+    first paragraph of the description. Also hosts <ww-product-extras>
+    (ATC price, gallery pills, mobile accordion state).
+  - ww_stock: "In stock in Black, ready to ship" (Dawn refreshes it on
+    variant change via the Inventory-<section> id)
+  - ww_delivery_estimate: zones, business-day arrival, cut-off, free shipping
+  - ww_accordion: 60px rows; content from the setting or from the product
+    description (everything after its first paragraph)
+  - ww_sticky_atc: mobile add-to-cart bar
+
+  Accepts:
+  - block: {Object} (required)
+  - product: {Object} (required)
+  - section_id: {String} (required)
+{%- endcomment -%}
+{%- liquid
+  assign b = block.settings
+  assign variant = product.selected_or_first_available_variant
+
+  assign colour_index = -1
+  for option in product.options_with_values
+    assign option_name = option.name | downcase
+    if option_name == 'color' or option_name == 'colour'
+      assign colour_index = forloop.index0
+      break
+    endif
+  endfor
+  assign colour = ''
+  if colour_index >= 0
+    assign colour = variant.options[colour_index]
+  endif
+
+  assign description_parts = product.description | split: '</p>'
+-%}
+
+{%- case block.type -%}
+  {%- when 'ww_heading' -%}
+    {%- liquid
+      assign badge_label = ''
+      assign badge_pairs = b.badges | split: ','
+      for pair in badge_pairs
+        assign pair_parts = pair | split: ':'
+        assign tag = pair_parts[0] | strip | downcase
+        if product.tags contains tag
+          assign badge_label = pair_parts[1] | strip
+          break
+        endif
+      endfor
+
+      assign title_words = product.title | split: ' '
+      assign title_last = title_words | last
+      assign title_lead = product.title | remove_last: title_last | strip
+      if b.italic_last_word == false or title_words.size < 2
+        assign title_lead = product.title
+        assign title_last = ''
+      endif
+    -%}
+    <div class="ww-pdp-heading ww-scope" {{ block.shopify_attributes }}>
+      {%- if badge_label != blank or b.rating_text != blank -%}
+        <div class="ww-pdp-heading__meta">
+          {%- if badge_label != blank -%}
+            <span class="ww-pdp-heading__badge">{{ badge_label | escape }}</span>
+          {%- endif -%}
+          {%- if b.rating_text != blank -%}
+            <a class="ww-pdp-heading__rating" href="{{ b.rating_link | default: '#reviews' }}">
+              {%- render 'ww-icon', icon: 'star', size: 15 -%}
+              {{- b.rating_text | escape -}}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+      <h1 class="ww-pdp-heading__title">
+        {{- title_lead | escape }}
+        {% if title_last != blank %}<em>{{ title_last | escape }}</em>{% endif -%}
+      </h1>
+      <div class="ww-pdp-heading__price-row">
+        <div id="price-{{ section_id }}" class="ww-pdp-heading__price" role="status">
+          <span class="ww-pdp-heading__amount">{{ variant.price | money_without_trailing_zeros }}</span>
+          {%- if variant.compare_at_price > variant.price -%}
+            <s class="ww-pdp-heading__compare">{{ variant.compare_at_price | money_without_trailing_zeros }}</s>
+          {%- endif -%}
+        </div>
+        {%- if b.price_note != blank -%}
+          <span class="ww-pdp-heading__note">
+            <span class="ww-pdp-heading__desktop-copy">{{ b.price_note | escape }}</span>
+            <span class="ww-pdp-heading__mobile-copy">{{ b.price_note_mobile | default: b.price_note | escape }}</span>
+          </span>
+        {%- endif -%}
+      </div>
+      {%- if b.show_description and product.description != blank -%}
+        <div class="ww-pdp-heading__description">
+          {%- if description_parts.size > 1 -%}
+            {{ description_parts | first | append: '</p>' }}
+          {%- else -%}
+            {{ product.description }}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+      <ww-product-extras
+        data-section="{{ section_id }}"
+        data-price="{{ variant.price }}"
+        data-money-format="{{ shop.money_format | strip_html | escape }}"
+        data-separator="{{ b.atc_separator | escape }}"
+      ></ww-product-extras>
+    </div>
+    <script src="{{ 'ww-shipping.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'ww-product.js' | asset_url }}" defer="defer"></script>
+
+  {%- when 'ww_stock' -%}
+    <p id="Inventory-{{ section_id }}" class="ww-stock{% unless variant.available %} is-out{% endunless %}" role="status" {{ block.shopify_attributes }}>
+      <span class="ww-stock__dot" aria-hidden="true"></span>
+      {%- if variant.available -%}
+        {{ b.in_stock_text | replace: '[colour]', colour | escape }}
+      {%- else -%}
+        {{ b.sold_out_text | replace: '[colour]', colour | escape }}
+      {%- endif -%}
+    </p>
+
+  {%- when 'ww_delivery_estimate' -%}
+    {%- liquid
+      assign zones_text = b.zones | default: settings.ww_shipping_zones
+      assign zone_lines = zones_text | newline_to_br | split: '<br />'
+      assign first_zone = zone_lines.first | strip | split: '|'
+    -%}
+    <script src="{{ 'ww-shipping.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'ww-delivery-estimate.js' | asset_url }}" defer="defer"></script>
+    <ww-delivery-estimate
+      class="ww-estimate ww-scope"
+      data-locale="{{ request.locale.iso_code }}"
+      data-timezone="{{ settings.ww_timezone | default: 'Europe/Belgrade' | escape }}"
+      data-cutoff-hour="{{ settings.ww_cutoff_hour }}"
+      data-days="{{ b.days_text | escape }}"
+      data-money-format="{{ shop.money_format | strip_html | escape }}"
+      data-zones="{{ zones_text | escape }}"
+      {{ block.shopify_attributes }}
+    >
+      <div class="ww-estimate__head">
+        <h2 class="ww-estimate__title">
+          {%- render 'ww-icon', icon: 'truck', size: 22 -%}
+          {{- b.heading | escape -}}
+        </h2>
+        {%- if b.tag != blank -%}
+          <span class="ww-estimate__tag">{{ b.tag | escape }}</span>
+        {%- endif -%}
+      </div>
+      <label class="ww-estimate__field">
+        {{- b.zone_label | escape -}}
+        <select class="ww-estimate__select" data-ww-zone>
+          {%- for line in zone_lines -%}
+            {%- assign zone = line | strip | split: '|' -%}
+            {%- if zone[0] != blank -%}
+              <option value="{{ zone[0] | strip | escape }}">{{ zone[0] | strip | escape }}</option>
+            {%- endif -%}
+          {%- endfor -%}
+        </select>
+      </label>
+      <div class="ww-estimate__tiles">
+        <div class="ww-estimate__tile">
+          <span class="ww-estimate__tile-label">{{ b.arrival_label | escape }}</span>
+          <span class="ww-estimate__tile-value" data-ww-arrival>&nbsp;</span>
+          <span class="ww-estimate__tile-sub" data-ww-days>&nbsp;</span>
+        </div>
+        <div class="ww-estimate__tile">
+          <span class="ww-estimate__tile-label">{{ b.shipping_label | escape }}</span>
+          <span class="ww-estimate__tile-value" data-ww-price>{{ first_zone[3] | strip | escape }}</span>
+          <span class="ww-estimate__tile-sub" data-ww-carrier>{{ first_zone[4] | strip | escape }}</span>
+        </div>
+      </div>
+      {%- render 'ww-cutoff', class: 'ww-estimate__cutoff' -%}
+      <div class="ww-estimate__free">
+        {%- render 'ww-free-shipping' -%}
+      </div>
+    </ww-delivery-estimate>
+
+  {%- when 'ww_accordion' -%}
+    {%- liquid
+      assign accordion_content = b.content
+      if b.source == 'description_details' and description_parts.size > 1
+        assign accordion_content = description_parts | slice: 1, description_parts.size | join: '</p>'
+      endif
+    -%}
+    {%- if accordion_content != blank -%}
+      <details
+        class="ww-accordion"
+        {% if b.open %}
+          open data-desktop-open
+        {% endif %}
+        {{ block.shopify_attributes }}
+      >
+        <summary class="ww-accordion__summary">
+          {{- b.heading | escape -}}
+          {%- render 'ww-icon', icon: 'plus', size: 18 -%}
+        </summary>
+        <div class="ww-accordion__content">{{ accordion_content }}</div>
+      </details>
+    {%- endif -%}
+
+  {%- when 'ww_sticky_atc' -%}
+    {%- assign sticky_image = variant.featured_image | default: product.featured_image -%}
+    <ww-sticky-atc class="ww-sticky-atc ww-scope" data-section="{{ section_id }}" data-colour-index="{{ colour_index }}" hidden {{ block.shopify_attributes }}>
+      <span class="ww-sticky-atc__thumb">
+        {%- if sticky_image -%}
+          {{ sticky_image | image_url: width: 120 | image_tag: width: 44, height: 44, alt: '', loading: 'lazy', data-ww-sticky-img: '' }}
+        {%- endif -%}
+      </span>
+      <span class="ww-sticky-atc__text">
+        <span class="ww-sticky-atc__title">
+          {{- b.short_title | default: product.title | escape -}}
+          {%- if colour != blank %} · <span data-ww-sticky-colour>{{ colour | escape }}</span>{% endif -%}
+        </span>
+        <span class="ww-sticky-atc__price" data-ww-sticky-price>{{ variant.price | money_without_trailing_zeros }}</span>
+      </span>
+      <button type="button" class="ww-btn ww-btn--primary ww-sticky-atc__button" data-ww-sticky-add>
+        {{- b.button_label | escape -}}
+      </button>
+    </ww-sticky-atc>
+{%- endcase -%}

@@ -90,6 +90,8 @@
               {%- case block.type -%}
                 {%- when '@app' -%}
                   {% render block %}
+                {%- when 'ww_heading', 'ww_stock', 'ww_delivery_estimate', 'ww_accordion', 'ww_sticky_atc' -%}
+                  {% render 'ww-product-block', block: block, product: product, section_id: section.id %}
                 {%- when 'text' -%}
                   <p
                     class="product__text inline-richtext{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}"
@@ -762,6 +764,11 @@
     {
       "type": "@app"
     },
+    {"type": "ww_heading", "name": "WW: Heading & price", "limit": 1, "settings": [{"type": "text", "id": "badges", "label": "Badge from tags", "info": "tag:Label pairs, comma separated. First match wins.", "default": "bestseller:Bestseller, new:New"}, {"type": "text", "id": "rating_text", "label": "Rating text", "default": "4.8 · 126 sample reviews"}, {"type": "text", "id": "rating_link", "label": "Rating link", "info": "Anchor of the reviews section.", "default": "#reviews"}, {"type": "checkbox", "id": "italic_last_word", "label": "Italic last word of the title", "default": true}, {"type": "text", "id": "price_note", "label": "Price note", "default": "Tax included. Demo store – checkout is disabled."}, {"type": "text", "id": "price_note_mobile", "label": "Price note on mobile", "default": "Tax included · Demo checkout"}, {"type": "checkbox", "id": "show_description", "label": "Show the first paragraph of the description", "default": true}, {"type": "text", "id": "atc_separator", "label": "Add to cart price separator", "info": "Shown between 'Add to cart' and the total. Leave empty to hide the price.", "default": " · "}]},
+    {"type": "ww_stock", "name": "WW: Stock line", "limit": 1, "settings": [{"type": "text", "id": "in_stock_text", "label": "In stock text", "info": "[colour] is replaced by the selected colour.", "default": "In stock in [colour], ready to ship"}, {"type": "text", "id": "sold_out_text", "label": "Sold out text", "default": "Sold out in [colour]"}]},
+    {"type": "ww_delivery_estimate", "name": "WW: Delivery estimate", "limit": 1, "settings": [{"type": "paragraph", "content": "Threshold, cut-off, timezone and texts are shared with the cart drawer: Theme settings → Wander Way demo."}, {"type": "text", "id": "heading", "label": "Heading", "default": "Delivery estimate"}, {"type": "text", "id": "tag", "label": "Tag", "default": "Custom section"}, {"type": "text", "id": "zone_label", "label": "Zone label", "default": "Ship to"}, {"type": "textarea", "id": "zones", "label": "Shipping zones", "info": "One per line: Name|minDays|maxDays|price|carrier. Leave empty to use the zones from Theme settings.", "default": "Serbia|1|2|€4.90|Local courier\nEuropean Union|3|5|€9.90|Tracked, DDP\nUnited Kingdom|4|6|€14.90|Tracked, duties paid\nRest of world|6|10|€24.90|Express, tracked"}, {"type": "text", "id": "arrival_label", "label": "Arrival label", "default": "Estimated arrival"}, {"type": "text", "id": "days_text", "label": "Business days text", "info": "[min] and [max] are replaced.", "default": "[min]–[max] business days"}, {"type": "text", "id": "shipping_label", "label": "Shipping label", "default": "Shipping"}]},
+    {"type": "ww_accordion", "name": "WW: Accordion row", "settings": [{"type": "text", "id": "heading", "label": "Heading", "default": "Details"}, {"type": "select", "id": "source", "label": "Content", "options": [{"value": "setting", "label": "Text below"}, {"value": "description_details", "label": "Product description after its first paragraph"}], "default": "setting"}, {"type": "richtext", "id": "content", "label": "Text", "default": "<p>Recycled nylon shell with a water-resistant coating. Wipe clean with a damp cloth.</p>"}, {"type": "checkbox", "id": "open", "label": "Open by default (desktop)", "default": false}]},
+    {"type": "ww_sticky_atc", "name": "WW: Sticky add to cart", "limit": 1, "settings": [{"type": "text", "id": "short_title", "label": "Short title", "info": "Leave empty to use the product title.", "default": "Daypack"}, {"type": "text", "id": "button_label", "label": "Button label", "default": "Add to cart"}]},
     {
       "type": "text",
       "name": "t:sections.main-product.blocks.text.name",
@@ -883,6 +890,13 @@
       "name": "t:sections.main-product.blocks.variant_picker.name",
       "limit": 1,
       "settings": [
+        {
+          "type": "text",
+          "id": "ww_colour_label",
+          "label": "Label for the Color option",
+          "info": "Shown instead of the option name \"Color\".",
+          "default": "Colour"
+        },
         {
           "type": "select",
           "id": "picker_type",
