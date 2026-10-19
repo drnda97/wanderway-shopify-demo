@@ -1,0 +1,207 @@
+{%- comment -%}
+  Wander Way demo – product card with colour swatches.
+  Image 4/5 tinted with the colour, badge from tags, title + price, colour meta
+  and one swatch per value of the product's colour option. Clicking a swatch
+  swaps image, label and links to that variant (ww-card-swatches.js).
+
+  Accepts:
+  - card_product: {Object} product (required)
+  - colour: {String} colour value to show first (optional; defaults to the
+    colour named in the featured image alt text, then the first variant)
+  - show_category: {Boolean} append " · Category" (product type) to the meta line
+  - show_colour_label: {Boolean} colour pill on the image (collection grid)
+  - badges: {String} "tag:Label" pairs, comma separated. Default "bestseller:Bestseller, new:New"
+  - categories: {String} tags used as the category label, comma separated
+    (first match wins, falls back to the product type)
+  - lazy: {Boolean} lazy-load the image (default true)
+  - sizes: {String} image sizes attribute
+
+  Usage:
+  {% render 'ww-card-product', card_product: product, show_category: true, show_colour_label: true %}
+{%- endcomment -%}
+{%- liquid
+  assign p = card_product
+  assign sizes = sizes | default: '(min-width: 990px) 400px, (min-width: 750px) 33vw, 50vw'
+  assign badges = badges | default: 'bestseller:Bestseller, new:New'
+  assign categories = categories | default: 'backpacks, travel, totes, accessories'
+  assign loading = 'lazy'
+  if lazy == false
+    assign loading = 'eager'
+  endif
+  assign widths = '300,450,600,800,1000'
+  assign width_list = widths | split: ','
+
+  comment
+    Colour option: first option called Color / Colour.
+  endcomment
+  assign colour_option = null
+  for option in p.options_with_values
+    assign option_name = option.name | downcase
+    if option_name == 'color' or option_name == 'colour'
+      assign colour_option = option
+      break
+    endif
+  endfor
+
+  assign current_variant = p.selected_or_first_available_variant
+  if colour_option
+    assign wanted = colour | default: '' | downcase
+    if wanted == blank
+      assign featured_alt = p.featured_image.alt | downcase
+      for value in colour_option.values
+        assign value_lower = value | downcase
+        if featured_alt contains value_lower
+          assign wanted = value_lower
+          break
+        endif
+      endfor
+    endif
+    if wanted != blank
+      for variant in p.variants
+        assign variant_value = variant.options[colour_option.position | minus: 1] | downcase
+        if variant_value == wanted
+          assign current_variant = variant
+          break
+        endif
+      endfor
+    endif
+    assign current_colour = current_variant.options[colour_option.position | minus: 1]
+  endif
+
+  assign image = current_variant.featured_image | default: p.featured_image
+  assign colour_handle = current_colour | handleize
+
+  assign badge_label = ''
+  if p.available == false
+    assign badge_label = 'products.product.sold_out' | t
+  else
+    assign badge_pairs = badges | split: ','
+    for pair in badge_pairs
+      assign pair_parts = pair | split: ':'
+      assign tag = pair_parts[0] | strip | downcase
+      for product_tag in p.tags
+        assign product_tag_lower = product_tag | downcase
+        if product_tag_lower == tag
+          assign badge_label = pair_parts[1] | strip
+          break
+        endif
+      endfor
+      if badge_label != ''
+        break
+      endif
+    endfor
+  endif
+
+  assign category = p.type
+  if show_category
+    assign category_tags = categories | split: ','
+    for category_tag in category_tags
+      assign category_tag = category_tag | strip | downcase
+      if p.tags contains category_tag
+        assign category = category_tag | capitalize
+        break
+      endif
+    endfor
+  endif
+
+  if p.price_varies
+    assign price_label = 'products.product.price.from_price_html' | t: price: p.price_min | money_without_trailing_zeros
+  else
+    assign price_label = p.price | money_without_trailing_zeros
+  endif
+
+  assign title = p.title | escape
+  assign alt = title
+  if current_colour
+    assign alt = title | append: ' in ' | append: current_colour
+  endif
+-%}
+<ww-card-swatches
+  class="ww-card"
+  style="--ww-card-tint: var(--ww-tint-{{ colour_handle }}, var(--ww-surface-2));"
+>
+  <a
+    href="{{ current_variant.url | default: p.url }}"
+    class="ww-card__media"
+    tabindex="-1"
+    aria-hidden="true"
+    data-ww-card-link
+  >
+    {%- if image -%}
+      {{
+        image
+        | image_url: width: 1000
+        | image_tag:
+          widths: widths,
+          sizes: sizes,
+          loading: loading,
+          alt: alt,
+          class: 'ww-card__img',
+          data-ww-card-img: ''
+      }}
+    {%- else -%}
+      {{ 'product-apparel-1' | placeholder_svg_tag: 'ww-card__img ww-card__img--placeholder' }}
+    {%- endif -%}
+    {%- if badge_label != '' -%}
+      <span class="ww-badge ww-card__badge">{{ badge_label }}</span>
+    {%- endif -%}
+    {%- if show_colour_label and current_colour -%}
+      <span class="ww-card__colour-pill">
+        <span class="ww-dot" style="--ww-dot: var(--ww-swatch-{{ colour_handle }}, var(--ww-border-strong));" data-ww-card-dot></span>
+        <span data-ww-card-colour>{{ current_colour | escape }}</span>
+      </span>
+    {%- endif -%}
+  </a>
+
+  <div class="ww-card__info">
+    <a href="{{ current_variant.url | default: p.url }}" class="ww-card__title" data-ww-card-link>{{ title }}</a>
+    <span class="ww-card__price">{{ price_label }}</span>
+    {%- if current_colour or show_category -%}
+      <span class="ww-card__meta">
+        {%- if current_colour -%}<span data-ww-card-colour>{{ current_colour | escape }}</span>{%- endif -%}
+        {%- if show_category and category != blank -%}
+          {%- if current_colour %} · {% endif -%}
+          {{- category | escape -}}
+        {%- endif -%}
+      </span>
+    {%- endif -%}
+  </div>
+
+  {%- if colour_option and colour_option.values.size > 1 -%}
+    <div class="ww-card__swatches" role="group" aria-label="{{ colour_option.name | escape }}">
+      {%- for value in colour_option.values -%}
+        {%- liquid
+          assign value_variant = null
+          for variant in p.variants
+            if variant.options[colour_option.position | minus: 1] == value
+              assign value_variant = variant
+              break
+            endif
+          endfor
+          assign value_image = value_variant.featured_image | default: p.featured_image
+          assign value_handle = value | handleize
+          assign is_current = false
+          if value == current_colour
+            assign is_current = true
+          endif
+        -%}
+        <button
+          type="button"
+          class="ww-card__swatch"
+          aria-label="{{ title }} in {{ value | escape }}"
+          aria-pressed="{{ is_current }}"
+          data-colour="{{ value | escape }}"
+          data-handle="{{ value_handle }}"
+          data-url="{{ value_variant.url | default: p.url }}"
+          {%- if value_image %}
+            data-src="{{ value_image | image_url: width: 1000 }}"
+            data-srcset="{% for w in width_list %}{% assign w_px = w | plus: 0 %}{% if w_px <= value_image.width %}{{ value_image | image_url: width: w }} {{ w }}w{% unless forloop.last %}, {% endunless %}{% endif %}{% endfor %}"
+          {%- endif %}
+          style="--ww-dot: var(--ww-swatch-{{ value_handle }}, {{ value.swatch.color | default: 'var(--ww-border-strong)' }});"
+        >
+          <span class="ww-card__swatch-dot"></span>
+        </button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</ww-card-swatches>
