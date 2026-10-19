@@ -184,7 +184,7 @@
       {%- if request.page_type == 'index' -%}
         <h1 class="header__heading">
       {%- endif -%}
-      <a href="{{ routes.root_url }}" class="header__heading-link link link--text focus-inset">
+      <a href="{{ routes.root_url }}" class="header__heading-link ww-wordmark link link--text focus-inset">
         {%- if settings.logo != blank -%}
           <div class="header__heading-logo-wrapper">
             {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
@@ -205,8 +205,9 @@
             }}
           </div>
         {%- else -%}
-          <span class="h2">{{ shop.name }}</span>
+          <span class="ww-wordmark__name">{{ section.settings.ww_wordmark | default: shop.name | escape }}</span>
         {%- endif -%}
+        <span class="ww-badge-demo">{{ section.settings.ww_badge_text | default: 'Demo' | escape }}</span>
       </a>
       {%- if request.page_type == 'index' -%}
         </h1>
@@ -227,7 +228,7 @@
       {%- if request.page_type == 'index' -%}
         <h1 class="header__heading">
       {%- endif -%}
-      <a href="{{ routes.root_url }}" class="header__heading-link link link--text focus-inset">
+      <a href="{{ routes.root_url }}" class="header__heading-link ww-wordmark link link--text focus-inset">
         {%- if settings.logo != blank -%}
           <div class="header__heading-logo-wrapper">
             {%- assign logo_alt = settings.logo.alt | default: shop.name | escape -%}
@@ -248,8 +249,9 @@
             }}
           </div>
         {%- else -%}
-          <span class="h2">{{ shop.name }}</span>
+          <span class="ww-wordmark__name">{{ section.settings.ww_wordmark | default: shop.name | escape }}</span>
         {%- endif -%}
+        <span class="ww-badge-demo">{{ section.settings.ww_badge_text | default: 'Demo' | escape }}</span>
       </a>
       {%- if request.page_type == 'index' -%}
         </h1>
@@ -287,7 +289,7 @@
           menu="{{ settings.customer_account_menu | default: 'customer-account-main-menu' }}"
           class="header__icon header__icon--account link focus-inset"
         >
-          <span slot="signed-out-avatar" class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
+          <span slot="signed-out-avatar" class="svg-wrapper">{% render 'ww-icon', icon: 'account' %}</span>
           <span slot="signed-out-avatar" class="visually-hidden">{{ 'customer.log_in' | t }}</span>
         </shopify-account>
       {%- endif -%}
@@ -300,11 +302,7 @@
       {%- endfor -%}
 
       <a href="{{ routes.cart_url }}" class="header__icon header__icon--cart link focus-inset" id="cart-icon-bubble">
-        {% if cart == empty %}
-          <span class="svg-wrapper">{{ 'icon-cart-empty.svg' | inline_asset_content }}</span>
-        {% else %}
-          <span class="svg-wrapper">{{ 'icon-cart.svg' | inline_asset_content }}</span>
-        {% endif %}
+        <span class="svg-wrapper">{% render 'ww-icon', icon: 'bag' %}</span>
         <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
         {%- if cart != empty -%}
           <div class="cart-count-bubble">
@@ -504,6 +502,20 @@
   "class": "section-header",
   "max_blocks": 3,
   "settings": [
+    {
+      "type": "text",
+      "id": "ww_wordmark",
+      "label": "Wordmark text",
+      "info": "Shown when no logo image is set. Leave empty to use the store name.",
+      "default": "Wander Way"
+    },
+    {
+      "type": "text",
+      "id": "ww_badge_text",
+      "label": "Demo badge",
+      "info": "Always visible next to the wordmark.",
+      "default": "Demo"
+    },
     {
       "type": "select",
       "id": "logo_position",

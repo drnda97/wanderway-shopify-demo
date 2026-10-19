@@ -1,0 +1,30 @@
+{%- comment -%}
+  Wander Way demo – announcement bar. Not dismissible: the store must always
+  read as a demo. Mono label is shown from 750px up.
+{%- endcomment -%}
+<div class="ww-announcement color-{{ section.settings.color_scheme }} gradient" role="region" aria-label="{{ section.settings.text | escape }}">
+  {%- if section.settings.label != blank -%}
+    <span class="ww-announcement__label">{{ section.settings.label | escape }}</span>
+  {%- endif -%}
+  {%- if section.settings.link != blank -%}
+    <a class="ww-announcement__text" href="{{ section.settings.link }}">{{ section.settings.text | escape }}</a>
+  {%- else -%}
+    <span class="ww-announcement__text">{{ section.settings.text | escape }}</span>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "WW: Announcement",
+  "tag": "div",
+  "class": "section-ww-announcement",
+  "enabled_on": { "groups": ["header"] },
+  "settings": [
+    { "type": "text", "id": "label", "label": "Label", "default": "Demo" },
+    { "type": "text", "id": "text", "label": "Text", "default": "Demo store by Wander Way – no real orders" },
+    { "type": "url", "id": "link", "label": "Link" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-2" }
+  ],
+  "presets": [{ "name": "WW: Announcement" }]
+}
+{% endschema %}

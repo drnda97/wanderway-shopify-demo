@@ -2,27 +2,52 @@
   "name": "t:sections.footer.name",
   "type": "footer",
   "sections": {
-    "footer": {
-      "type": "footer",
-      "blocks": {},
-      "block_order": [],
+    "ww-footer": {
+      "type": "ww-footer",
+      "blocks": {
+        "shop": {
+          "type": "links",
+          "settings": {
+            "heading": "Shop",
+            "links": "All products|/collections/all\nBackpacks|/collections/backpacks\nAccessories|/collections/accessories",
+            "hide_on_mobile": false
+          }
+        },
+        "help": {
+          "type": "links",
+          "settings": {
+            "heading": "Help",
+            "links": "Shipping|/policies/shipping-policy\nReturns|/policies/refund-policy\nFAQ|/pages/faq",
+            "hide_on_mobile": false
+          }
+        },
+        "studio": {
+          "type": "links",
+          "settings": {
+            "heading": "Studio",
+            "links": "wanderway.rs|https://wanderway.rs\nHire us|https://wanderway.rs",
+            "hide_on_mobile": true
+          }
+        }
+      },
+      "block_order": [
+        "shop",
+        "help",
+        "studio"
+      ],
       "settings": {
-        "color_scheme": "scheme-1",
-        "newsletter_enable": true,
-        "newsletter_heading": "Subscribe to our emails",
-        "enable_follow_on_shop": true,
-        "show_social": true,
-        "enable_country_selector": true,
-        "enable_language_selector": true,
-        "payment_enable": true,
-        "show_policy": true,
-        "margin_top": 0,
-        "padding_top": 36,
-        "padding_bottom": 36
+        "columns_on": "home",
+        "wordmark": "Wander Way",
+        "badge": "Demo",
+        "text": "A fictional store for showing Shopify theme work. Products, prices and reviews are samples. Photos via Unsplash.",
+        "copyright": "© 2026 Wander Way · Demo store, no real orders",
+        "credit_text": "Built by Wander Way – wanderway.rs",
+        "credit_url": "https://wanderway.rs",
+        "color_scheme": "scheme-1"
       }
     }
   },
   "order": [
-    "footer"
+    "ww-footer"
   ]
 }

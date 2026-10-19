@@ -1,0 +1,114 @@
+{%- comment -%}
+  Wander Way demo – footer. Brand column + link columns (blocks) and a bottom
+  row with the studio credit. The mockups show the columns on the home page
+  only, so that's the default ("Show columns").
+{%- endcomment -%}
+{%- liquid
+  assign show_columns = true
+  if section.settings.columns_on == 'home' and request.page_type != 'index'
+    assign show_columns = false
+  endif
+-%}
+<footer class="ww-footer ww-scope color-{{ section.settings.color_scheme }} gradient{% unless show_columns %} ww-footer--compact{% endunless %}">
+  <div class="ww-footer__inner page-width">
+    {%- if show_columns -%}
+      <div class="ww-footer__top">
+        <div class="ww-footer__brand">
+          {%- render 'ww-wordmark', text: section.settings.wordmark, badge: section.settings.badge -%}
+          {%- if section.settings.text != blank -%}
+            <p class="ww-footer__text">{{ section.settings.text | escape }}</p>
+          {%- endif -%}
+        </div>
+        {%- for block in section.blocks -%}
+          <nav
+            class="ww-footer__col{% if block.settings.hide_on_mobile %} ww-footer__col--desktop{% endif %}"
+            aria-label="{{ block.settings.heading | escape }}"
+            {{ block.shopify_attributes }}
+          >
+            <span class="ww-eyebrow">{{ block.settings.heading | escape }}</span>
+            {%- if block.settings.menu != blank -%}
+              {%- for link in block.settings.menu.links -%}
+                <a class="ww-footer__link" href="{{ link.url }}">{{ link.title | escape }}</a>
+              {%- endfor -%}
+            {%- else -%}
+              {%- assign lines = block.settings.links | newline_to_br | split: '<br />' -%}
+              {%- for line in lines -%}
+                {%- assign parts = line | strip | split: '|' -%}
+                {%- if parts[0] != blank -%}
+                  {%- assign href = parts[1] | strip | default: '#' -%}
+                  <a class="ww-footer__link" href="{{ href }}"{% if href contains '://' %} target="_blank" rel="noopener"{% endif %}>
+                    {{- parts[0] | strip | escape -}}
+                  </a>
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+          </nav>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+    <div class="ww-footer__bottom">
+      <span class="ww-footer__copy">{{ section.settings.copyright | escape }}</span>
+      {%- if section.settings.credit_text != blank -%}
+        <a class="ww-footer__credit" href="{{ section.settings.credit_url | default: 'https://wanderway.rs' }}" target="_blank" rel="noopener">
+          {{- section.settings.credit_text | escape -}}
+          {%- render 'ww-icon', icon: 'arrow-up-right', size: 14, stroke: 1.8 -%}
+          <span class="visually-hidden">({{ 'accessibility.link_messages.new_window' | t }})</span>
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "WW: Footer",
+  "tag": "div",
+  "class": "section-ww-footer",
+  "enabled_on": { "groups": ["footer"] },
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "select",
+      "id": "columns_on",
+      "label": "Show brand and link columns",
+      "options": [
+        { "value": "all", "label": "On every page" },
+        { "value": "home", "label": "Home page only" }
+      ],
+      "default": "home"
+    },
+    { "type": "text", "id": "wordmark", "label": "Wordmark", "default": "Wander Way" },
+    { "type": "text", "id": "badge", "label": "Demo badge", "default": "Demo" },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Brand text",
+      "default": "A fictional store for showing Shopify theme work. Products, prices and reviews are samples. Photos via Unsplash."
+    },
+    { "type": "header", "content": "Bottom row" },
+    { "type": "text", "id": "copyright", "label": "Copyright", "default": "© 2026 Wander Way · Demo store, no real orders" },
+    { "type": "text", "id": "credit_text", "label": "Credit link text", "default": "Built by Wander Way – wanderway.rs" },
+    { "type": "url", "id": "credit_url", "label": "Credit link", "info": "Defaults to https://wanderway.rs" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" }
+  ],
+  "blocks": [
+    {
+      "type": "links",
+      "name": "Link column",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Shop" },
+        { "type": "link_list", "id": "menu", "label": "Menu", "info": "Overrides the links below." },
+        {
+          "type": "textarea",
+          "id": "links",
+          "label": "Links",
+          "info": "One per line: Label|URL",
+          "default": "All products|/collections/all\nBackpacks|/collections/backpacks\nAccessories|/collections/accessories"
+        },
+        { "type": "checkbox", "id": "hide_on_mobile", "label": "Hide on mobile", "default": false }
+      ]
+    }
+  ],
+  "presets": [{ "name": "WW: Footer" }]
+}
+{% endschema %}

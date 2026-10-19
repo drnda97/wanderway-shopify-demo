@@ -1,0 +1,15 @@
+{%- comment -%}
+  Wander Way demo – text wordmark + "Demo" pill. The pill is always rendered so
+  every page reads as a demo store.
+
+  Accepts:
+  - text: {String} wordmark text (falls back to shop.name)
+  - badge: {String} pill text (falls back to "Demo")
+
+  Usage:
+  {% render 'ww-wordmark', text: section.settings.ww_wordmark, badge: section.settings.ww_badge_text %}
+{%- endcomment -%}
+<span class="ww-wordmark">
+  <span class="ww-wordmark__name">{{ text | default: shop.name | escape }}</span>
+  <span class="ww-badge-demo">{{ badge | default: 'Demo' | escape }}</span>
+</span>
