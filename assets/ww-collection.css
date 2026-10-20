@@ -101,6 +101,11 @@
   display: none;
 }
 
+/* Dawn's drawer-mode pills form duplicates our active-filter chips */
+.ww-collection__drawer .facets-container > .facets-pill {
+  display: none;
+}
+
 /* Dawn's #ProductCount stays as the screen-reader live region */
 .ww-collection__drawer .product-count {
   position: absolute;
@@ -627,8 +632,21 @@
     content: ' (' attr(data-ww-count) ')';
   }
 
-  .ww-collection__drawer details[open] .mobile-facets__open-wrapper .mobile-facets__close {
-    display: none;
+  /* Drawer close button (Dawn shows it while the drawer is open) */
+  .ww-collection__drawer details.menu-opening .mobile-facets__close {
+    top: 14px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--ww-border);
+    border-radius: var(--ww-radius-pill);
+    background: var(--ww-surface);
+    color: var(--ww-ink);
+  }
+
+  .ww-collection__drawer details.menu-opening .mobile-facets__close .svg-wrapper {
+    width: 18px;
+    height: 18px;
   }
 
   .ww-collection__drawer .mobile-facets__disclosure .mobile-facets__inner {
