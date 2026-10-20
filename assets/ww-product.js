@@ -5,6 +5,11 @@
  *   - "Add to cart · €148": price × quantity, follows quantity and variant
  *   - gallery overlay: view label ("Black · Front"), "1 / 4" counter, mobile dots
  *   - accordion rows marked "open on desktop" start closed below 750px
+ *   - colour change transition: on PUB_SUB_EVENTS.optionValueSelectionChange
+ *     (the click, before Dawn fetches the new variant) the current photo is
+ *     frozen as an overlay; on variantChange (after Dawn swapped the media)
+ *     the overlay fades out over the new, decoded photo, which settles from a
+ *     slight zoom. The buy-box values that changed slide in, staggered.
  *
  * <ww-sticky-atc data-section>
  *   Mobile bar that appears once the main Add to cart button has scrolled
@@ -20,6 +25,8 @@
     });
   };
   const mobile = window.matchMedia('(max-width: 749px)');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const EASE = 'cubic-bezier(.2, .7, .2, 1)';
 
   if (!customElements.get('ww-product-extras')) {
     customElements.define(
@@ -42,13 +49,129 @@
             this.available = Boolean(variant?.available);
             if (variant) this.price = variant.price;
             this.renderAddToCartPrice();
-            window.requestAnimationFrame(() => this.renderGallery());
+            window.requestAnimationFrame(() => {
+              this.renderGallery();
+              this.revealGallery();
+              this.animateBuyBox();
+            });
           });
+          if (typeof subscribe === 'function' && typeof PUB_SUB_EVENTS !== 'undefined') {
+            this.unsubscribeSelection = subscribe(PUB_SUB_EVENTS.optionValueSelectionChange, ({ data }) => {
+              if (this.root.contains(data?.event?.target)) this.freezeGallery();
+            });
+          }
         }
 
         disconnectedCallback() {
           this.unsubscribe?.();
+          this.unsubscribeSelection?.();
           this.galleryObserver?.disconnect();
+        }
+
+        /* ---- Colour change transition ---- */
+        activeMedia() {
+          if (!this.viewer) return null;
+          if (mobile.matches) {
+            const items = Array.from(this.viewer.querySelectorAll('.product__media-item')).filter((item) => item.offsetParent);
+            return items[Math.min(this.page, items.length) - 1] || items[0];
+          }
+          return this.viewer.querySelector('.product__media-item.is-active');
+        }
+
+        /** Freeze the current photo on top while Dawn fetches the new variant. */
+        freezeGallery() {
+          if (reducedMotion.matches || !this.viewer) return;
+          this.ghost?.remove();
+          const media = this.activeMedia();
+          const frame = media?.querySelector('.product-media-container');
+          const img = frame?.querySelector('img');
+          if (!img) return;
+
+          const viewerRect = this.viewer.getBoundingClientRect();
+          const rect = frame.getBoundingClientRect();
+          const ghost = document.createElement('div');
+          ghost.className = 'ww-gallery__ghost';
+          ghost.setAttribute('aria-hidden', 'true');
+          Object.assign(ghost.style, {
+            left: `${rect.left - viewerRect.left}px`,
+            top: `${rect.top - viewerRect.top}px`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`,
+            borderRadius: getComputedStyle(frame).borderRadius,
+          });
+          const copy = new Image();
+          copy.alt = '';
+          copy.src = img.currentSrc || img.src;
+          ghost.append(copy);
+          this.viewer.append(ghost);
+          this.ghost = ghost;
+          // Safety net: never leave the overlay if no variantChange follows.
+          window.clearTimeout(this.ghostTimer);
+          this.ghostTimer = window.setTimeout(() => this.dropGhost(), 4000);
+        }
+
+        dropGhost() {
+          const ghost = this.ghost;
+          this.ghost = null;
+          if (!ghost) return;
+          ghost.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, easing: EASE }).finished.finally(() => ghost.remove());
+        }
+
+        async revealGallery() {
+          const ghost = this.ghost;
+          if (!ghost) return;
+          window.clearTimeout(this.ghostTimer);
+          const img = this.activeMedia()?.querySelector('.product-media-container img');
+          if (img) {
+            try {
+              await img.decode();
+            } catch (error) {
+              /* reveal anyway */
+            }
+          }
+          if (ghost !== this.ghost) return;
+          this.ghost = null;
+          if (img && img.currentSrc !== ghost.querySelector('img').src) {
+            img.animate([{ transform: 'scale(1.05)', filter: 'saturate(.7)' }, { transform: 'none', filter: 'none' }], {
+              duration: 700,
+              easing: EASE,
+            });
+          }
+          ghost
+            .animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.985)' }], { duration: 520, easing: EASE, fill: 'forwards' })
+            .finished.finally(() => ghost.remove());
+
+          const firstThumb = this.root.querySelector('.thumbnail-list__item:not([hidden]) .thumbnail');
+          firstThumb?.animate([{ opacity: 0, transform: 'scale(.92)' }, { opacity: 1, transform: 'none' }], {
+            duration: 480,
+            easing: EASE,
+          });
+        }
+
+        /** The values that change with the colour slide in, one after the other. */
+        animateBuyBox() {
+          if (reducedMotion.matches) return;
+          const targets = [
+            this.root.querySelector('.ww-option-value'),
+            this.root.querySelector(`#price-${this.sectionId} .ww-pdp-heading__amount`),
+            this.priceLabel,
+            this.root.querySelector(`#Inventory-${this.sectionId}`),
+          ].filter(Boolean);
+          targets.forEach((el, i) => {
+            if (getComputedStyle(el).display === 'inline') el.style.display = 'inline-block';
+            el.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], {
+              duration: 380,
+              delay: i * 45,
+              easing: EASE,
+              fill: 'backwards',
+            });
+          });
+          this.root
+            .querySelector('.product-form__input--pill input:checked + label')
+            ?.animate([{ transform: 'scale(.96)' }, { transform: 'scale(1.02)', offset: 0.6 }, { transform: 'none' }], {
+              duration: 380,
+              easing: EASE,
+            });
         }
 
         /* ---- Add to cart · €148 ---- */

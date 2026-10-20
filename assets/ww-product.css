@@ -56,6 +56,7 @@ product-info .product__media-list .product-media-container {
   border: 0;
   border-radius: var(--ww-radius-xl);
   overflow: hidden;
+  clip-path: inset(0 round var(--ww-radius-xl)); /* keeps the colour-change zoom inside the corners */
   background: var(--ww-surface-2);
   box-shadow: none;
 }
@@ -63,6 +64,12 @@ product-info .product__media-list .product-media-container {
 product-info .product__media-list .product__media {
   height: 100%;
   padding-top: 0;
+  border-radius: inherit; /* Dawn's inner clip box; rounded so the zoomed photo stays in the corners */
+  transform: translateZ(0); /* own layer, so the rounded clip also applies to the animated photo */
+}
+
+product-info .product__media-list .product__modal-opener {
+  border-radius: inherit;
 }
 
 product-info .product__media-list .product__media img {
@@ -86,6 +93,24 @@ product-info .ww-gallery .slider-buttons {
   align-items: flex-end;
   padding: 20px;
   pointer-events: none;
+}
+
+.ww-gallery__ghost {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ww-gallery__ghost img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ww-gallery__overlay {
+  z-index: 2;
 }
 
 .ww-gallery__label {
@@ -920,6 +945,7 @@ ww-colour-story {
   product-info .product__media-list .product-media-container {
     aspect-ratio: 1 / 1.1;
     border-radius: 0;
+    clip-path: inset(0);
   }
 
   product-info .product__media-list.slider--mobile {
