@@ -136,6 +136,13 @@
   border-color: var(--ww-ink);
 }
 
+.ww-chip--clear {
+  border-color: transparent;
+  background: transparent;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .ww-collection__sort-label {
   display: flex;
   align-items: center;
@@ -400,7 +407,7 @@
 
   .ww-collection__summary {
     grid-area: chips;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 8px;
     min-height: 0;
     margin: 0 calc(var(--ww-gutter) * -1);
@@ -413,7 +420,49 @@
     white-space: nowrap;
   }
 
+  /* Non-colour active filters: one horizontally scrolling row of 44px chips */
   .ww-collection__chips {
+    display: none;
+  }
+
+  .ww-collection__chips.has-other {
+    order: 0;
+    display: flex;
+    flex: 0 0 100%;
+    gap: 8px;
+    margin: 0 calc(var(--ww-gutter) * -1) 6px;
+    padding: 0 var(--ww-gutter) 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .ww-collection__chips.has-other::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ww-collection__chips .ww-chip-wrap--colour {
+    display: none; /* shown by the colour chips row instead */
+  }
+
+  .ww-collection__chips .ww-chip {
+    flex: none;
+    height: 44px;
+    padding: 0 16px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .ww-collection__chips .ww-chip .ww-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .ww-collection__chips .ww-chip--clear {
+    padding: 0 8px;
+  }
+
+  /* Dawn's own mobile filter pills: replaced by the row above */
+  .ww-collection__drawer .active-facets-mobile {
     display: none;
   }
 
@@ -439,7 +488,7 @@
 
   .ww-chip--colour {
     gap: 8px;
-    height: 40px;
+    height: 44px;
     padding: 0 14px 0 10px;
     border-color: var(--ww-border);
     background: transparent;
@@ -528,8 +577,11 @@
     padding: 0;
   }
 
-  .ww-collection__drawer .mobile-facets__wrapper {
+  .ww-collection__drawer .mobile-facets__wrapper,
+  .ww-collection__drawer .mobile-facets__disclosure,
+  .ww-collection__drawer .mobile-facets__open-wrapper {
     display: block;
+    width: 100%;
     margin: 0;
   }
 

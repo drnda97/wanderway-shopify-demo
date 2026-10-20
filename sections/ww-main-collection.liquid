@@ -24,16 +24,20 @@
   assign colour_filter = null
   assign active_colour = ''
   assign active_count = 0
+  assign other_active = 0
   for filter in collection.filters
     assign param = filter.param_name | downcase
     if param contains 'color' or param contains 'colour'
       assign colour_filter = filter
       assign active_colour = filter.active_values.first.value | default: ''
+    else
+      assign other_active = other_active | plus: filter.active_values.size
     endif
     assign active_count = active_count | plus: filter.active_values.size
     if filter.type == 'price_range'
       if filter.min_value.value != null or filter.max_value.value != null
         assign active_count = active_count | plus: 1
+        assign other_active = other_active | plus: 1
       endif
     endif
   endfor
@@ -105,10 +109,21 @@
               <span class="ww-collection__count-desktop">{{ s.count_label | replace: '[count]', collection.products_count | escape }}</span>
               <span class="ww-collection__count-mobile">{{ s.count_label_mobile | replace: '[count]', collection.products_count | escape }}</span>
             </span>
-            <div class="ww-collection__chips active-facets-desktop">
+            {%- comment -%}
+              Active filter chips. On mobile the colour ones are hidden (the colour
+              chips below already show them) and the rest scroll in one row.
+            {%- endcomment -%}
+            <div class="ww-collection__chips active-facets-desktop{% if other_active > 0 %} has-other{% endif %}">
               {%- for filter in collection.filters -%}
+                {%- liquid
+                  assign param = filter.param_name | downcase
+                  assign is_colour_filter = false
+                  if param contains 'color' or param contains 'colour'
+                    assign is_colour_filter = true
+                  endif
+                -%}
                 {%- for value in filter.active_values -%}
-                  <facet-remove>
+                  <facet-remove{% if is_colour_filter %} class="ww-chip-wrap--colour"{% endif %}>
                     <a href="{{ value.url_to_remove }}" class="ww-chip ww-chip--remove">
                       {{- filter.label | escape }}: {{ value.label | escape -}}
                       {%- render 'ww-icon', icon: 'close', size: 14, stroke: 2 -%}
@@ -116,7 +131,25 @@
                     </a>
                   </facet-remove>
                 {%- endfor -%}
+                {%- if filter.type == 'price_range' -%}
+                  {%- if filter.min_value.value != null or filter.max_value.value != null -%}
+                    <facet-remove>
+                      <a href="{{ filter.url_to_remove }}" class="ww-chip ww-chip--remove">
+                        {{- filter.min_value.value | default: 0 | money_without_trailing_zeros }} – {{ filter.max_value.value | default: filter.range_max | money_without_trailing_zeros -}}
+                        {%- render 'ww-icon', icon: 'close', size: 14, stroke: 2 -%}
+                        <span class="visually-hidden">{{ 'products.facets.clear_filter' | t }}</span>
+                      </a>
+                    </facet-remove>
+                  {%- endif -%}
+                {%- endif -%}
               {%- endfor -%}
+              {%- if active_count > 1 -%}
+                <facet-remove class="ww-chip-wrap--clear">
+                  <a href="{{ collection.url }}?sort_by={{ sort_by }}" class="ww-chip ww-chip--clear">
+                    {{- 'products.facets.clear_all' | t -}}
+                  </a>
+                </facet-remove>
+              {%- endif -%}
             </div>
             {%- if colour_filter -%}
               <div class="ww-collection__colour-chips" role="group" aria-label="{{ colour_filter.label | escape }}">

@@ -151,11 +151,15 @@
                       <p class="ww-cart-item__meta">
                         {%- if colour != blank -%}
                           <span class="ww-dot" style="--ww-dot: var(--ww-swatch-{{ colour_handle }}, var(--ww-border-strong));" aria-hidden="true"></span>
-                          {{ colour | escape }}
-                        {%- elsif item.product.has_only_default_variant == false -%}
-                          {{ item.variant.title | escape }}
                         {%- endif -%}
-                        <span class="ww-cart-item__unit"> · {{ item.final_price | money_without_trailing_zeros }}</span>
+                        <span>
+                          {%- if colour != blank -%}
+                            {{ colour | escape }}
+                          {%- elsif item.product.has_only_default_variant == false -%}
+                            {{ item.variant.title | escape }}
+                          {%- endif -%}
+                          <span class="ww-cart-item__unit"> · {{ item.final_price | money_without_trailing_zeros }}</span>
+                        </span>
                       </p>
                       {%- for property in item.properties -%}
                         {%- assign property_first_char = property.first | slice: 0 -%}
