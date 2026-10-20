@@ -669,6 +669,10 @@
     gap: 10px;
   }
 
+  .ww-newsletter__input {
+    flex: none;
+  }
+
   .ww-newsletter__button {
     width: 100%;
   }

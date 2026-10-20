@@ -96,9 +96,8 @@
 
   assign category = p.type
   if show_category
-    assign category_tags = categories | split: ','
+    assign category_tags = categories | downcase | remove: ' ' | split: ','
     for category_tag in category_tags
-      assign category_tag = category_tag | strip | downcase
       if p.tags contains category_tag
         assign category = category_tag | capitalize
         break

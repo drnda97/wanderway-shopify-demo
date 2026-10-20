@@ -157,7 +157,7 @@
   font-size: 15px;
   color: var(--ww-ink);
   cursor: pointer;
-  min-width: 174px;
+  width: 190px;
 }
 
 .ww-collection__select:hover {
@@ -175,6 +175,11 @@
 
 .ww-collection__grid .ww-card {
   --ww-card-gap: 14px;
+}
+
+.ww-collection__grid .ww-card__info {
+  row-gap: 0;
+  line-height: 1.4;
 }
 
 .ww-collection__empty {
@@ -200,7 +205,7 @@
   flex-direction: column;
   gap: 12px;
   margin: 0;
-  padding: 24px 0;
+  padding: 0 0 24px; /* as in the design: the legend sits on the top edge, the 24px go below it */
   border: 0;
   border-bottom: 1px solid var(--ww-border);
   min-width: 0;
@@ -214,7 +219,7 @@
   float: left;
   width: 100%;
   padding: 0;
-  margin-bottom: 12px;
+  margin-bottom: 36px;
   font-size: 15px;
   font-weight: 600;
   line-height: 1.6;
@@ -225,8 +230,9 @@
   clear: both;
 }
 
-.ww-facet--colour .ww-facet__legend {
-  margin-bottom: 14px;
+.ww-facet--colour .ww-facet__legend,
+.ww-facet:has(.ww-facet__price) .ww-facet__legend {
+  margin-bottom: 38px;
 }
 
 .ww-facet__list {
@@ -385,6 +391,7 @@
   .ww-collection__controls {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
     gap: 10px;
     min-height: 0;
     padding: 0;
@@ -393,11 +400,17 @@
 
   .ww-collection__summary {
     grid-area: chips;
-    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: 8px;
     min-height: 0;
     margin: 0 calc(var(--ww-gutter) * -1);
     padding: 14px var(--ww-gutter) 16px;
-    position: relative;
+  }
+
+  .ww-collection__count {
+    order: 2;
+    margin-left: auto;
+    white-space: nowrap;
   }
 
   .ww-collection__chips {
@@ -405,14 +418,10 @@
   }
 
   .ww-collection__colour-chips {
-    grid-area: chips;
+    order: 1;
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 14px;
-    align-self: start;
-    z-index: 1;
-    position: relative;
   }
 
   .ww-collection__count {
@@ -457,6 +466,7 @@
 
   /* Sort pill */
   .ww-collection__sort-label {
+    box-sizing: border-box;
     position: relative;
     justify-content: center;
     gap: 4px;
@@ -487,6 +497,7 @@
 
   .ww-collection__select {
     position: static;
+    width: auto;
     height: auto;
     min-width: 0;
     padding: 0;
@@ -514,6 +525,7 @@
   /* Dawn drawer trigger as a pill */
   .ww-collection__drawer .facets-container {
     display: block;
+    padding: 0;
   }
 
   .ww-collection__drawer .mobile-facets__wrapper {

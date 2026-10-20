@@ -25,7 +25,8 @@
         "count_label": "[count] products",
         "count_label_mobile": "[count] items",
         "empty_text": "No products match these filters.",
-        "badges": "bestseller:Bestseller, new:New"
+        "badges": "bestseller:Bestseller, new:New",
+        "colour_order": "Black, Sand, Olive"
       }
     }
   },

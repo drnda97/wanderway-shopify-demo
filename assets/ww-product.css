@@ -109,12 +109,12 @@ product-info .thumbnail-slider {
   margin-top: 16px;
 }
 
-product-info .thumbnail-list {
+product-info .thumbnail-slider .thumbnail-list.thumbnail-list {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-  margin: 0;
-  padding: 2px 4px 4px;
+  margin: 0 -4px; /* room for the selected ring, still aligned to the gutter */
+  padding: 4px;
 }
 
 product-info .thumbnail-list__item {
@@ -186,6 +186,10 @@ product-info .product__view-details {
 
 .ww-pdp-heading p {
   margin: 0;
+}
+
+ww-product-extras {
+  display: none; /* behaviour only */
 }
 
 .ww-pdp-heading__meta {
@@ -325,6 +329,9 @@ product-info .product-form__input--pill input[type='radio'] + label.ww-pill-dot 
 
 product-info .product-form__input--pill input[type='radio'] + label.ww-pill-dot::before {
   content: '';
+  position: static; /* Dawn uses this pseudo-element, absolutely positioned, for its pill outline */
+  z-index: auto; /* Dawn's -1 would put the dot behind the pill (flex items honour z-index) */
+  flex: none;
   width: 22px;
   height: 22px;
   border-radius: var(--ww-radius-pill);
@@ -464,6 +471,11 @@ product-info .shopify-payment-button__button--unbranded {
   font-weight: var(--ww-btn-fw);
   letter-spacing: 0;
   box-shadow: none;
+}
+
+product-info .shopify-payment-button__button--unbranded::before,
+product-info .shopify-payment-button__button--unbranded::after {
+  display: none; /* Dawn's extra button outline */
 }
 
 product-info .shopify-payment-button__button--unbranded:hover:not([disabled]) {
@@ -666,7 +678,12 @@ product-info .product__pickup-availabilities {
 }
 
 /* ---- Colour story ------------------------------------------------------- */
+ww-colour-story {
+  display: block;
+}
+
 .ww-colour-story__card {
+  position: relative;
   display: grid;
   border: 1px solid var(--ww-border);
   border-radius: var(--ww-radius-xl);
@@ -678,10 +695,16 @@ product-info .product__pickup-availabilities {
   grid-area: 1 / 1;
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-  min-height: 640px;
+  min-height: 640px; /* + 2px card border = 642 as in the design */
   opacity: 0;
   visibility: hidden;
   transition: opacity var(--ww-dur-ui) var(--ww-ease), visibility 0s linear var(--ww-dur-ui);
+}
+
+/* Only the active panel sizes the card; the others overlay it while fading */
+.ww-colour-story__panel:not(.is-active) {
+  position: absolute;
+  inset: 0;
 }
 
 .ww-colour-story__panel.is-active {
@@ -871,6 +894,11 @@ product-info .product__pickup-availabilities {
 
 /* ---- Mobile --------------------------------------------------------------- */
 @media screen and (max-width: 749px) {
+  /* Product-Mobile.dc.html spaces its sections 56px apart (64px elsewhere) */
+  main[data-template='product'] {
+    --ww-section-gap: 56px;
+  }
+
   .ww-breadcrumb--product {
     display: none;
   }
@@ -900,9 +928,15 @@ product-info .product__pickup-availabilities {
     scroll-padding-left: 0;
   }
 
-  product-info .product__media-list .product__media-item {
+  product-info .product__media-list.slider--mobile .product__media-item.slider__slide {
     width: 100%;
     margin: 0;
+    padding: 0;
+  }
+
+  product-info .product__media-list .product__media,
+  product-info .product__media-list .product__media img {
+    border-radius: 0;
   }
 
   product-info .ww-gallery.slider-mobile-gutter {

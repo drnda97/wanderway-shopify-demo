@@ -63,7 +63,7 @@
   column-gap: 12px;
   row-gap: 2px;
   align-items: start;
-  line-height: 1.4;
+  line-height: 1.6;
 }
 
 .ww-card__title {
@@ -160,6 +160,7 @@
       'title'
       'price';
     row-gap: 0;
+    line-height: 1.4;
   }
 
   .ww-card__title {

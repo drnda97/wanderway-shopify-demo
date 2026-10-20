@@ -5,9 +5,8 @@
 {%- endcomment -%}
 {%- liquid
   assign category = ''
-  assign category_tags = section.settings.category_tags | downcase | split: ','
+  assign category_tags = section.settings.category_tags | downcase | remove: ' ' | split: ','
   for tag in category_tags
-    assign tag = tag | strip
     if product.tags contains tag
       assign category = tag
       break

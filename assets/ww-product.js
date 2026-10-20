@@ -105,22 +105,31 @@
 
         renderGallery() {
           if (!this.overlay) return;
-          const items = Array.from(this.viewer.querySelectorAll('.product__media-item')).filter(
+          // Desktop shows one media at a time; the visible thumbnails are the real list.
+          const thumbnails = Array.from(this.root.querySelectorAll('.thumbnail-list__item')).filter(
+            (item) => item.offsetParent !== null
+          );
+          const media = Array.from(this.viewer.querySelectorAll('.product__media-item')).filter(
             (item) => item.offsetParent !== null || item.classList.contains('is-active')
           );
-          if (!items.length) return;
+          const useThumbnails = !mobile.matches && thumbnails.length > 0;
+          const count = useThumbnails ? thumbnails.length : media.length;
+          if (!count) return;
 
-          let index = items.findIndex((item) => item.classList.contains('is-active'));
-          if (mobile.matches) index = Math.min(this.page, items.length) - 1;
+          let index = useThumbnails
+            ? thumbnails.findIndex((item) => item.querySelector('[aria-current]'))
+            : media.findIndex((item) => item.classList.contains('is-active'));
+          if (mobile.matches) index = Math.min(this.page, count) - 1;
           index = Math.max(0, index);
 
-          const img = items[index].querySelector('img');
+          const active = this.viewer.querySelector('.product__media-item.is-active') || media[index];
+          const img = (mobile.matches ? media[index] : active)?.querySelector('img');
           const label = (img?.alt || '').split(' – ').pop();
           this.overlay.querySelector('.ww-gallery__label').textContent = label;
           this.overlay.querySelector('.ww-gallery__label').hidden = !label;
-          this.overlay.querySelector('.ww-gallery__count').textContent = `${index + 1} / ${items.length}`;
+          this.overlay.querySelector('.ww-gallery__count').textContent = `${index + 1} / ${count}`;
           this.overlay.querySelector('.ww-gallery__dots').replaceChildren(
-            ...items.map((_, i) => {
+            ...Array.from({ length: count }, (_, i) => {
               const dot = document.createElement('span');
               if (i === index) dot.className = 'is-active';
               return dot;

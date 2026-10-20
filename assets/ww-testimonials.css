@@ -222,7 +222,7 @@
 
 .ww-testimonials--grid .ww-review {
   padding: 28px;
-  min-height: 340px;
+  min-height: 398px; /* design: content-box 340 + 2×28 padding + 2px border */
 }
 
 /* Single layout ---------------------------------------------------------- */
@@ -385,6 +385,10 @@
     gap: 18px;
   }
 
+  .ww-testimonials--single .ww-h2 {
+    font-size: 30px;
+  }
+
   .ww-testimonials__summary {
     gap: 14px;
     margin-top: 0;
@@ -442,7 +446,7 @@
 
   .ww-testimonials--grid .ww-review {
     padding: 22px;
-    min-height: 290px;
+    min-height: 336px; /* design: content-box 290 + 2×22 padding + 2px border */
     border-radius: 18px;
   }
 

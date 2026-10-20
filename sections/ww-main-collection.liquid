@@ -47,7 +47,12 @@
     {%- paginate collection.products by s.products_per_page -%}
       {%- if s.enable_filtering -%}
         <aside class="ww-collection__sidebar" aria-label="{{ 'products.facets.filter_button' | t }}">
-          {%- render 'ww-facets', results: collection, category_tags: s.category_tags, in_stock_label: s.in_stock_label -%}
+          {%- render 'ww-facets',
+            results: collection,
+            category_tags: s.category_tags,
+            colour_order: s.colour_order,
+            in_stock_label: s.in_stock_label
+          -%}
         </aside>
       {%- endif -%}
 
@@ -113,28 +118,43 @@
                 {%- endfor -%}
               {%- endfor -%}
             </div>
+            {%- if colour_filter -%}
+              <div class="ww-collection__colour-chips" role="group" aria-label="{{ colour_filter.label | escape }}">
+                {%- assign colour_order = s.colour_order | downcase | remove: ' ' | split: ',' -%}
+                {%- capture ordered_chips -%}
+                  {%- for wanted in colour_order -%}
+                    {%- for value in colour_filter.values -%}
+                      {%- assign value_lower = value.value | downcase | remove: ' ' -%}
+                      {%- if value_lower == wanted -%}{{ forloop.index0 }},{%- endif -%}
+                    {%- endfor -%}
+                  {%- endfor -%}
+                  {%- for value in colour_filter.values -%}
+                    {%- assign value_lower = value.value | downcase | remove: ' ' -%}
+                    {%- unless colour_order contains value_lower -%}{{ forloop.index0 }},{%- endunless -%}
+                  {%- endfor -%}
+                {%- endcapture -%}
+                {%- assign chip_indexes = ordered_chips | strip | split: ',' -%}
+                {%- for chip_index in chip_indexes -%}
+                  {%- assign chip_position = chip_index | plus: 0 -%}
+                  {%- assign value = colour_filter.values[chip_position] -%}
+                  {%- assign value_handle = value.value | handleize -%}
+                  <facet-remove>
+                    <a
+                      href="{% if value.active %}{{ value.url_to_remove }}{% else %}{{ value.url_to_add }}{% endif %}"
+                      class="ww-chip ww-chip--colour{% if value.active %} is-active{% endif %}"
+                      aria-pressed="{{ value.active }}"
+                    >
+                      <span
+                        class="ww-chip__dot"
+                        style="--ww-dot: var(--ww-swatch-{{ value_handle }}, {{ value.swatch.color | default: 'var(--ww-border-strong)' }});"
+                      ></span>
+                      {{- value.label | escape -}}
+                    </a>
+                  </facet-remove>
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
           </div>
-
-          {%- if colour_filter -%}
-            <div class="ww-collection__colour-chips" role="group" aria-label="{{ colour_filter.label | escape }}">
-              {%- for value in colour_filter.values -%}
-                {%- assign value_handle = value.value | handleize -%}
-                <facet-remove>
-                  <a
-                    href="{% if value.active %}{{ value.url_to_remove }}{% else %}{{ value.url_to_add }}{% endif %}"
-                    class="ww-chip ww-chip--colour{% if value.active %} is-active{% endif %}"
-                    aria-pressed="{{ value.active }}"
-                  >
-                    <span
-                      class="ww-chip__dot"
-                      style="--ww-dot: var(--ww-swatch-{{ value_handle }}, {{ value.swatch.color | default: 'var(--ww-border-strong)' }});"
-                    ></span>
-                    {{- value.label | escape -}}
-                  </a>
-                </facet-remove>
-              {%- endfor -%}
-            </div>
-          {%- endif -%}
 
           <div class="collection ww-collection__grid-wrap">
             {%- if collection.products.size == 0 -%}
@@ -193,6 +213,7 @@
       "default": "backpacks, travel, totes, accessories"
     },
     { "type": "text", "id": "in_stock_label", "label": "Availability checkbox label", "default": "In stock only" },
+    { "type": "text", "id": "colour_order", "label": "Colour order", "info": "Colour filter values shown first, in this order.", "default": "Black, Sand, Olive" },
     { "type": "text", "id": "featured_label", "label": "Label for the 'Featured' sort option", "default": "Featured" },
     { "type": "text", "id": "sort_prefix_mobile", "label": "Sort prefix on mobile", "default": "Sort:" },
     { "type": "text", "id": "count_label", "label": "Product count", "info": "[count] is replaced by the number.", "default": "[count] products" },
