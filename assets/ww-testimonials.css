@@ -1,6 +1,7 @@
 /* Wander Way demo – ww-testimonials (layouts: grid, single) */
 .ww-testimonials {
   display: grid;
+  overflow-x: clip; /* sliding cards never cause a horizontal scrollbar */
 }
 
 .ww-testimonials__intro {
@@ -80,8 +81,21 @@
 }
 
 .ww-testimonials__track {
+  position: relative; /* anchors the copy of the card that slides out */
   grid-area: track;
   display: grid;
+}
+
+.ww-review--ghost {
+  position: absolute;
+  z-index: 0;
+  margin: 0;
+  pointer-events: none;
+}
+
+.ww-testimonials .ww-review:not(.ww-review--ghost) {
+  position: relative;
+  z-index: 1;
 }
 
 .ww-testimonials__track:focus-visible {

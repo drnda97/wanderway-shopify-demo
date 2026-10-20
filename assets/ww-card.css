@@ -24,6 +24,12 @@
   transition: transform var(--ww-dur-img) ease;
 }
 
+.ww-card__img--incoming {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
 .ww-card__img--placeholder {
   fill: var(--ww-ink-3);
 }
@@ -34,12 +40,14 @@
 
 .ww-card__badge {
   position: absolute;
+  z-index: 2;
   top: 16px;
   left: 16px;
 }
 
 .ww-card__colour-pill {
   position: absolute;
+  z-index: 2;
   right: 14px;
   bottom: 14px;
   display: inline-flex;
@@ -84,6 +92,14 @@
   font-weight: 500;
   color: var(--ww-ink);
   white-space: nowrap;
+}
+
+[data-ww-card-colour] {
+  display: inline-block;
+}
+
+[data-ww-card-dot] {
+  transition: background-color var(--ww-dur-ui) var(--ww-ease);
 }
 
 .ww-card__meta {
