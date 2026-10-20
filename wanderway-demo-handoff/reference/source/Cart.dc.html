@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cart drawer – Wander Way demo store</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAFAFC}
+a{color:#111114}a:hover{color:#3346E0}
+.btn-1:hover{background:#2A2A31 !important}
+</style>
+</helmet>
+<div style="position: relative; width: 1440px; height: 900px; overflow: hidden; background: #FAFAFC; color: #111114; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased">
+
+<!-- Page behind (product page, dimmed) -->
+<div aria-hidden="true" style="position: absolute; inset: 0">
+<div style="background: #111114; color: #FAFAFC; text-align: center; padding: 10px 16px; font-size: 13.5px">Demo store by Wander Way – no real orders</div>
+<div style="height: 76px; padding: 0 80px; display: flex; align-items: center; border-bottom: 1px solid #E4E4EA"><span style="font-size: 21px; font-weight: 600; letter-spacing: -0.025em">Wander Way</span></div>
+<div style="padding: 56px 80px; display: grid; grid-template-columns: minmax(0, 1.22fr) minmax(0, 1fr); gap: 72px">
+<div style="aspect-ratio: 1 / 1; border-radius: 28px; overflow: hidden"><img src="images/daypack-black.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block"></div>
+<div style="display: flex; flex-direction: column; gap: 16px"><div style="font-size: 52px; font-weight: 500; letter-spacing: -0.035em; line-height: 1.04">Transit Daypack 22L</div><div style="font-size: 26px">€148</div></div>
+</div>
+</div>
+<div style="position: absolute; inset: 0; background: rgba(17,17,20,0.42)"></div>
+
+<!-- Drawer -->
+<aside role="dialog" aria-modal="true" aria-label="Your cart" style="position: absolute; top: 0; right: 0; bottom: 0; width: 480px; background: #FAFAFC; display: flex; flex-direction: column; box-shadow: -24px 0 60px -30px rgba(17,17,20,0.5)">
+<div style="padding: 24px 28px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E4E4EA">
+<div style="display: flex; align-items: baseline; gap: 10px"><h2 style="margin: 0; font-size: 24px; font-weight: 500; letter-spacing: -0.02em">Your <em style="font-weight: 400">cart</em></h2><span style="font-size: 14px; color: #5C5C69">{{ countLabel }}</span></div>
+<a href="Product.dc.html" aria-label="Close cart" style="width: 44px; height: 44px; border-radius: 999px; display: grid; place-items: center; color: #111114; border: 1px solid #E4E4EA; background: #FFFFFF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></a>
+</div>
+
+<!-- Free shipping progress -->
+<div style="padding: 20px 28px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid #E4E4EA; background: #FFFFFF">
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 14.5px">
+<sc-if value="{{ unlocked }}" hint-placeholder-val="{{ false }}"><span style="font-weight: 600; color: #1F6B45">You’ve unlocked free shipping</span></sc-if>
+<sc-if value="{{ notUnlocked }}" hint-placeholder-val="{{ true }}"><span>Add <strong style="font-weight: 600">{{ remaining }}</strong> more for free shipping</span></sc-if>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #5C5C69">{{ subtotal }} / €150</span>
+</div>
+<div role="progressbar" aria-label="Progress to free shipping" aria-valuemin="0" aria-valuemax="150" aria-valuenow="{{ subtotalNum }}" style="height: 8px; border-radius: 999px; background: #ECECF1; overflow: hidden"><div style="width: {{ pct }}; height: 100%; border-radius: 999px; background: {{ barColor }}"></div></div>
+<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4A4A55"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3346E0" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>Order within 2h 15m to ship today</div>
+</div>
+
+<!-- Line items -->
+<div style="flex: 1; overflow: auto; padding: 8px 28px">
+<sc-for list="{{ items }}" as="it" hint-placeholder-count="2">
+<div style="display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; padding: 20px 0; border-bottom: 1px solid #ECECF1">
+<a href="Product.dc.html" style="display: block; width: 96px; height: 116px; border-radius: 14px; overflow: hidden"><img src="{{ it.img }}" alt="{{ it.name }} in {{ it.colour }}" style="width: 100%; height: 100%; object-fit: cover; display: block"></a>
+<div style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+<div style="display: flex; justify-content: space-between; gap: 12px"><a href="Product.dc.html" style="font-size: 16px; font-weight: 500; text-decoration: none">{{ it.name }}</a><span style="font-size: 16px; font-weight: 500">{{ it.line }}</span></div>
+<span style="display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: #4A4A55"><span style="width: 12px; height: 12px; border-radius: 999px; background: {{ it.hex }}"></span>{{ it.colour }} · {{ it.price }}</span>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto">
+<div role="group" aria-label="Quantity for {{ it.name }}" style="display: flex; align-items: center; height: 40px; border: 1px solid #CFCFD8; border-radius: 999px; background: #FFFFFF">
+<button onClick="{{ it.dec }}" aria-label="Decrease quantity" style="width: 40px; height: 38px; border: 0; background: transparent; font: inherit; font-size: 18px; cursor: pointer; color: #111114; border-radius: 999px">−</button>
+<span style="min-width: 18px; text-align: center; font-size: 14.5px; font-weight: 500">{{ it.qty }}</span>
+<button onClick="{{ it.inc }}" aria-label="Increase quantity" style="width: 40px; height: 38px; border: 0; background: transparent; font: inherit; font-size: 18px; cursor: pointer; color: #111114; border-radius: 999px">+</button>
+</div>
+<button onClick="{{ it.remove }}" style="border: 0; background: transparent; font: inherit; font-size: 13.5px; color: #4A4A55; text-decoration: underline; cursor: pointer; min-height: 40px">Remove</button>
+</div>
+</div>
+</div>
+</sc-for>
+<sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}"><div style="padding: 48px 0; text-align: center; color: #4A4A55">Your cart is empty. <a href="Collection.dc.html">Keep shopping</a></div></sc-if>
+
+<!-- Upsell -->
+<sc-if value="{{ showUpsell }}" hint-placeholder-val="{{ true }}">
+<div style="margin: 20px 0 12px; padding: 14px; border: 1px solid #E4E4EA; border-radius: 16px; background: #FFFFFF; display: flex; align-items: center; gap: 14px">
+<img src="images/organiser-black.jpg" alt="Tech Organiser in Black" style="width: 56px; height: 56px; border-radius: 10px; object-fit: cover; display: block">
+<div style="flex: 1; display: flex; flex-direction: column; line-height: 1.35"><span style="font-size: 12px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.06em; text-transform: uppercase; color: #5C5C69">Unlocks free shipping</span><span style="font-size: 15px; font-weight: 500">Tech Organiser · €54</span></div>
+<button onClick="{{ addUpsell }}" style="height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid #111114; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 500; color: #111114; cursor: pointer">Add</button>
+</div>
+</sc-if>
+</div>
+
+<!-- Footer -->
+<div style="padding: 20px 28px 28px; border-top: 1px solid #E4E4EA; background: #FFFFFF; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; font-size: 15px; color: #4A4A55"><span>Shipping</span><span>{{ shipping }}</span></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 17px; font-weight: 600">Subtotal</span><span style="font-size: 22px; font-weight: 500; letter-spacing: -0.01em">{{ subtotal }}</span></div>
+<span style="font-size: 13px; color: #5C5C69">Taxes included. Discount codes at checkout.</span>
+<a class="btn-1" href="#" style="display: flex; justify-content: center; align-items: center; gap: 10px; height: 56px; border-radius: 999px; background: #111114; color: #FAFAFC; text-decoration: none; font-size: 16px; font-weight: 500">Checkout · {{ total }}</a>
+<span style="text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #5C5C69">Demo store – checkout is disabled</span>
+</div>
+</aside>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+var CATALOG = {
+  tote: { name: 'Everyday Tote', colour: 'Olive', hex: '#5F6B3C', price: 78, img: 'images/tote-olive.jpg' },
+  pouch: { name: 'Essentials Pouch', colour: 'Sand', hex: '#D3BF9C', price: 42, img: 'images/pouch-sand.jpg' },
+  organiser: { name: 'Tech Organiser', colour: 'Black', hex: '#1F1F22', price: 54, img: 'images/organiser-black.jpg' }
+};
+var FREE = 150;
+function eur(n) { return '€' + (Math.round(n * 100) / 100).toFixed(n % 1 ? 2 : 0); }
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { lines: [{ id: 'tote', qty: 1 }, { id: 'pouch', qty: 1 }] };
+  }
+  setQty(id, q) {
+    var lines = this.state.lines.map(function (l) { return l.id === id ? { id: l.id, qty: q } : l; }).filter(function (l) { return l.qty > 0; });
+    this.setState({ lines: lines });
+  }
+  renderVals() {
+    var self = this, lines = this.state.lines;
+    var sub = lines.reduce(function (s, l) { return s + CATALOG[l.id].price * l.qty; }, 0);
+    var count = lines.reduce(function (s, l) { return s + l.qty; }, 0);
+    var free = sub >= FREE;
+    var ship = sub === 0 ? 0 : (free ? 0 : 4.9);
+    return {
+      items: lines.map(function (l) {
+        var p = CATALOG[l.id];
+        return { name: p.name, colour: p.colour, hex: p.hex, img: p.img, qty: l.qty, price: eur(p.price), line: eur(p.price * l.qty),
+          inc: function () { self.setQty(l.id, Math.min(9, l.qty + 1)); },
+          dec: function () { self.setQty(l.id, l.qty - 1); },
+          remove: function () { self.setQty(l.id, 0); } };
+      }),
+      empty: lines.length === 0,
+      countLabel: count + (count === 1 ? ' item' : ' items'),
+      subtotal: eur(sub), subtotalNum: sub,
+      remaining: eur(Math.max(0, FREE - sub)),
+      unlocked: free, notUnlocked: !free,
+      pct: Math.min(100, Math.round(sub / FREE * 100)) + '%',
+      barColor: free ? '#2E9E63' : '#3346E0',
+      shipping: free ? 'Free' : (sub === 0 ? '—' : '€4.90 (Serbia)'),
+      total: eur(sub + ship),
+      showUpsell: !lines.some(function (l) { return l.id === 'organiser'; }) && !free,
+      addUpsell: function () { self.setState({ lines: self.state.lines.concat([{ id: 'organiser', qty: 1 }]) }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

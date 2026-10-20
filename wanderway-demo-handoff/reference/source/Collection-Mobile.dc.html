@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Collection mobile – Wander Way demo store</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAFAFC}
+a{color:#111114}a:hover{color:#3346E0}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 1947px; display: flex; flex-direction: column; background: #FAFAFC; color: #111114; font-family: 'Hanken Grotesk', system-ui, sans-serif; font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased">
+
+<div style="background: #111114; color: #FAFAFC; text-align: center; padding: 9px 16px; font-size: 12.5px">Demo store by Wander Way – no real orders</div>
+
+<header style="border-bottom: 1px solid #E4E4EA; height: 64px; padding: 0 8px 0 4px; display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center">
+<button aria-label="Open menu" style="width: 44px; height: 44px; border: 0; background: transparent; display: grid; place-items: center; color: #111114"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16"></path></svg></button>
+<a href="Home-Mobile.dc.html" aria-label="Wander Way demo store – home" style="display: flex; align-items: center; gap: 8px; text-decoration: none; color: #111114">
+<span style="font-size: 18px; font-weight: 600; letter-spacing: -0.025em">Wander Way</span>
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border: 1px solid #CFCFD8; border-radius: 999px; color: #4A4A55">Demo</span>
+</a>
+</div>
+<div style="display: flex">
+<button aria-label="Search" style="width: 44px; height: 44px; border: 0; background: transparent; display: grid; place-items: center; color: #111114"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg></button>
+<a href="Cart-Mobile.dc.html" aria-label="Cart, 2 items" style="position: relative; width: 44px; height: 44px; display: grid; place-items: center; color: #111114"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 13H6z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg><span style="position: absolute; top: 5px; right: 3px; min-width: 17px; height: 17px; border-radius: 999px; background: #111114; color: #FAFAFC; font-size: 10.5px; font-weight: 600; display: grid; place-items: center; line-height: 1">2</span></a>
+</div>
+</header>
+
+<section style="padding: 28px 20px 24px; display: flex; flex-direction: column; gap: 12px">
+<nav aria-label="Breadcrumb" style="font-size: 13.5px; color: #5C5C69; display: flex; gap: 8px"><a href="Home-Mobile.dc.html" style="color: #5C5C69; text-decoration: none">Home</a><span aria-hidden="true">/</span><span>Shop all</span></nav>
+<h1 style="margin: 0; font-size: 40px; line-height: 1.04; font-weight: 500; letter-spacing: -0.035em">Everything you need to <em style="font-weight: 400">go.</em></h1>
+<p style="margin: 0; font-size: 15.5px; color: #4A4A55">Every piece in Black, Sand and Olive.</p>
+</section>
+
+<!-- Sticky filter bar -->
+<div style="padding: 0 20px 16px; display: flex; flex-direction: column; gap: 14px; border-bottom: 1px solid #E4E4EA">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<button style="height: 46px; border-radius: 999px; border: 1px solid #CFCFD8; background: #FFFFFF; font: inherit; font-size: 15px; font-weight: 500; color: #111114; display: flex; align-items: center; justify-content: center; gap: 8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg>Filter{{ filterCount }}</button>
+<label style="position: relative; display: block"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Sort by</span>
+<select style="width: 100%; height: 46px; border-radius: 999px; border: 1px solid #CFCFD8; background: #FFFFFF; font: inherit; font-size: 15px; font-weight: 500; color: #111114; padding: 0 16px; text-align: center">
+<option>Sort: Featured</option><option>Price, low to high</option><option>Price, high to low</option>
+</select>
+</label>
+</div>
+<div role="group" aria-label="Filter by colour" style="display: flex; gap: 8px; align-items: center">
+<sc-for list="{{ colorFilters }}" as="f" hint-placeholder-count="3">
+<button onClick="{{ f.pick }}" aria-pressed="{{ f.on }}" style="display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px 0 10px; border-radius: 999px; border: 1px solid {{ f.border }}; background: {{ f.bg }}; font: inherit; font-size: 14px; color: #111114"><span style="width: 16px; height: 16px; border-radius: 999px; background: {{ f.hex }}; box-shadow: inset 0 0 0 1px rgba(17,17,20,0.12)"></span>{{ f.name }}</button>
+</sc-for>
+<span style="margin-left: auto; font-size: 13.5px; color: #5C5C69">{{ countLabel }}</span>
+</div>
+</div>
+
+<section style="padding: 24px 20px 64px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 12px">
+<sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
+<article style="display: flex; flex-direction: column; gap: 10px">
+<a href="Product-Mobile.dc.html" aria-label="{{ p.name }} in {{ p.colorName }}" style="position: relative; display: block; aspect-ratio: 4 / 5; border-radius: 16px; overflow: hidden; background: {{ p.tint }}">
+<img src="{{ p.img }}" alt="{{ p.name }} in {{ p.colorName }}" style="width: 100%; height: 100%; object-fit: cover; display: block">
+<sc-if value="{{ p.hasTag }}" hint-placeholder-val="{{ false }}"><span style="position: absolute; top: 10px; left: 10px; background: #FFFFFF; border-radius: 999px; padding: 2px 8px; font-size: 11.5px; font-weight: 500">{{ p.tag }}</span></sc-if>
+</a>
+<div style="display: flex; flex-direction: column; line-height: 1.4">
+<a href="Product-Mobile.dc.html" style="font-size: 14.5px; font-weight: 500; text-decoration: none">{{ p.name }}</a>
+<span style="font-size: 14px; color: #4A4A55">{{ p.price }}</span>
+</div>
+<div style="display: flex; margin: -10px 0 0 -12px">
+<sc-for list="{{ p.swatches }}" as="s" hint-placeholder-count="3">
+<button onClick="{{ s.pick }}" aria-label="{{ s.label }}" aria-pressed="{{ s.on }}" style="width: 44px; height: 44px; border: 0; background: transparent; padding: 0; display: grid; place-items: center"><span style="width: 18px; height: 18px; border-radius: 999px; background: {{ s.hex }}; box-shadow: 0 0 0 2px #FAFAFC, 0 0 0 3px {{ s.ring }}, inset 0 0 0 1px rgba(17,17,20,0.12)"></span></button>
+</sc-for>
+</div>
+</article>
+</sc-for>
+</section>
+
+<div style="flex: 1"></div>
+
+<footer style="border-top: 1px solid #E4E4EA; padding: 28px 20px; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; color: #5C5C69">
+<a href="https://wanderway.rs" style="color: #111114; font-weight: 500; text-decoration: none; font-size: 15px">Built by Wander Way – wanderway.rs ↗</a>
+<span>© 2026 Wander Way · Demo store, no real orders</span>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1947}}'>
+var COLORS = {
+  black: { name: 'Black', hex: '#1F1F22', tint: '#E9E9EE' },
+  sand: { name: 'Sand', hex: '#D3BF9C', tint: '#F2EDE3' },
+  olive: { name: 'Olive', hex: '#5F6B3C', tint: '#E7EADD' }
+};
+var PRODUCTS = [
+  { id: 'daypack', name: 'Transit Daypack 22L', price: '€148', type: 'backpack', tag: 'Bestseller', c: 'black' },
+  { id: 'weekender', name: 'Overnight Weekender 40L', price: '€196', type: 'weekender', tag: '', c: 'sand' },
+  { id: 'tote', name: 'Everyday Tote', price: '€78', type: 'tote', tag: '', c: 'olive' },
+  { id: 'pouch', name: 'Essentials Pouch', price: '€42', type: 'pouch', tag: 'New', c: 'sand' },
+  { id: 'rolltop', name: 'Roll-top Backpack 28L', price: '€172', type: 'rolltop', tag: '', c: 'sand' },
+  { id: 'duffel', name: 'Cabin Duffel 32L', price: '€164', type: 'duffel', tag: '', c: 'sand' },
+  { id: 'sling', name: 'Crossbody Sling', price: '€64', type: 'sling', tag: '', c: 'olive' },
+  { id: 'organiser', name: 'Tech Organiser', price: '€54', type: 'organiser', tag: '', c: 'black' }
+];
+var IMG = {
+  daypack: { black: 'images/daypack-black.jpg', sand: 'images/daypack-sand.jpg', olive: 'images/daypack-olive.jpg' },
+  weekender: { sand: 'images/weekender-sand.jpg' },
+  tote: { olive: 'images/tote-olive.jpg', sand: 'images/tote-sand.jpg' },
+  pouch: { sand: 'images/pouch-sand.jpg' },
+  rolltop: { sand: 'images/rolltop-sand.jpg' },
+  duffel: { sand: 'images/duffel-sand.jpg' },
+  sling: { olive: 'images/sling-olive.jpg' },
+  organiser: { black: 'images/organiser-black.jpg' }
+};
+function imgFor(id, c) { var m = IMG[id]; return m[c] || m[Object.keys(m)[0]]; }
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var picks = {};
+    PRODUCTS.forEach(function (p) { picks[p.id] = p.c; });
+    this.state = { picks: picks, color: null };
+  }
+  renderVals() {
+    var self = this, st = this.state;
+    var products = PRODUCTS.map(function (p) {
+      var key = st.color || st.picks[p.id], c = COLORS[key];
+      return {
+        name: p.name, price: p.price, tag: p.tag, hasTag: !!p.tag, hex: c.hex, tint: c.tint, colorName: c.name, img: imgFor(p.id, key),
+        isBackpack: p.type === 'backpack', isRolltop: p.type === 'rolltop', isWeekender: p.type === 'weekender', isDuffel: p.type === 'duffel',
+        isTote: p.type === 'tote', isPouch: p.type === 'pouch', isSling: p.type === 'sling', isOrganiser: p.type === 'organiser',
+        swatches: Object.keys(COLORS).map(function (k) {
+          var on = key === k;
+          return { hex: COLORS[k].hex, on: on, ring: on ? '#111114' : 'transparent', label: p.name + ' in ' + COLORS[k].name,
+            pick: function () { var n = Object.assign({}, self.state.picks); n[p.id] = k; self.setState({ picks: n, color: null }); } };
+        })
+      };
+    });
+    return {
+      products: products,
+      countLabel: products.length + ' items',
+      filterCount: st.color ? ' (1)' : '',
+      colorFilters: Object.keys(COLORS).map(function (k) {
+        var on = st.color === k;
+        return { name: COLORS[k].name, hex: COLORS[k].hex, on: on, border: on ? '#111114' : '#E4E4EA', bg: on ? '#FFFFFF' : 'transparent',
+          pick: function () { self.setState({ color: self.state.color === k ? null : k }); } };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>
