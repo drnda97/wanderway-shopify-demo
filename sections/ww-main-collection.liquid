@@ -164,7 +164,7 @@
             {%- else -%}
               <ul id="product-grid" data-id="{{ section.id }}" class="ww-collection__grid" role="list">
                 {%- for product in collection.products -%}
-                  <li>
+                  <li data-ww-reveal>
                     {%- liquid
                       assign lazy = true
                       if forloop.index <= 3

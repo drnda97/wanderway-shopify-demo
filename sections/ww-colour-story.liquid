@@ -40,7 +40,7 @@
   <script src="{{ 'ww-colour-story.js' | asset_url }}" defer="defer"></script>
 
   <ww-colour-story class="ww-colour-story ww-section ww-scope page-width" data-colour-index="{{ colour_index }}">
-    <div class="ww-colour-story__card">
+    <div class="ww-colour-story__card" data-ww-reveal>
       {%- assign shown = false -%}
       {%- for block in section.blocks -%}
         {%- liquid

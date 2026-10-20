@@ -78,6 +78,37 @@ em {
   }
 }
 
+/* ---- Motion --------------------------------------------------------------- */
+/* Scroll reveal (assets/ww-motion.js adds .is-pending only below the fold) */
+[data-ww-reveal] {
+  transition:
+    opacity 0.8s var(--ww-ease) var(--ww-reveal-delay, 0ms),
+    transform 0.8s var(--ww-ease) var(--ww-reveal-delay, 0ms);
+}
+
+[data-ww-reveal].is-pending {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+/* Arrows nudge towards where they lead */
+.ww-btn .ww-icon--arrow-right,
+.ww-link-arrow .ww-icon--arrow-right,
+.ww-footer__credit .ww-icon,
+.ww-hero__card-link .ww-icon {
+  transition: transform var(--ww-dur-ui) var(--ww-ease);
+}
+
+.ww-btn:hover .ww-icon--arrow-right,
+.ww-link-arrow:hover .ww-icon--arrow-right,
+.ww-hero__card-link:hover .ww-icon {
+  transform: translateX(3px);
+}
+
+.ww-footer__credit:hover .ww-icon {
+  transform: translate(2px, -2px);
+}
+
 /* ---- Shared atoms ------------------------------------------------------- */
 .ww-icon {
   display: block;
@@ -247,7 +278,7 @@ em {
   height: 100%;
   border-radius: var(--ww-radius-pill);
   background: var(--ww-accent);
-  transition: width var(--ww-dur-ui) var(--ww-ease);
+  transition: width 0.7s var(--ww-ease), background-color 0.4s var(--ww-ease);
 }
 
 .ww-free-shipping.is-unlocked .ww-free-shipping__bar span {

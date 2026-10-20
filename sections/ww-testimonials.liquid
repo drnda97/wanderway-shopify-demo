@@ -26,7 +26,7 @@
     id="{{ s.anchor | handleize }}"
   {% endif %}
 >
-  <div class="ww-testimonials__intro">
+  <div class="ww-testimonials__intro" data-ww-reveal>
     {%- if s.eyebrow != blank -%}
       <p class="ww-eyebrow">{{ s.eyebrow | escape }}</p>
     {%- endif -%}
@@ -76,6 +76,7 @@
     aria-live="polite"
     tabindex="0"
     data-ww-track
+    data-ww-reveal
   >
     {%- for block in section.blocks -%}
       {%- liquid

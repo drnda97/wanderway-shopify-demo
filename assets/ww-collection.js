@@ -2,7 +2,8 @@
  * Wander Way demo – <ww-collection>
  * Dawn's facets.js re-renders #ProductGridContainer after every filter
  * change. This element watches that container and mirrors the number of
- * active filters onto the drawer trigger ("Filter (2)").
+ * active filters onto the drawer trigger ("Filter (2)"), and fades the
+ * freshly rendered cards in.
  */
 if (!customElements.get('ww-collection')) {
   customElements.define(
@@ -11,13 +12,23 @@ if (!customElements.get('ww-collection')) {
       connectedCallback() {
         this.results = this.querySelector('#ProductGridContainer');
         if (!this.results) return;
-        this.observer = new MutationObserver(() => this.updateFilterCount());
+        this.observer = new MutationObserver(() => {
+          this.updateFilterCount();
+          this.animateResults();
+        });
         this.observer.observe(this.results, { childList: true });
         this.updateFilterCount();
       }
 
       disconnectedCallback() {
         this.observer?.disconnect();
+      }
+
+      animateResults() {
+        const cards = Array.from(this.querySelectorAll('#product-grid > li')).filter(
+          (card) => card.getBoundingClientRect().top < window.innerHeight
+        );
+        window.WWMotion?.swapIn(cards.slice(0, 9), { y: 16, duration: 520, stagger: 55 });
       }
 
       updateFilterCount() {

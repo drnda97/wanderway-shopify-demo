@@ -5,7 +5,7 @@
 
 {%- assign s = section.settings -%}
 <section class="ww-built ww-section ww-scope page-width" aria-label="{{ s.eyebrow | escape }}">
-  <div class="ww-built__card">
+  <div class="ww-built__card" data-ww-reveal>
     <div class="ww-built__intro">
       {%- if s.eyebrow != blank -%}
         <p class="ww-eyebrow">{{ s.eyebrow | escape }}</p>

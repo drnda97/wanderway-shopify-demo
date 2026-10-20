@@ -675,8 +675,23 @@ product-info .product__pickup-availabilities {
   display: none;
 }
 
-.ww-accordion[open] .ww-icon__vertical {
-  display: none;
+.ww-accordion .ww-icon__vertical {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform var(--ww-dur-ui) var(--ww-ease), opacity var(--ww-dur-ui) var(--ww-ease);
+}
+
+.ww-accordion[open]:not(.is-closing) .ww-icon__vertical {
+  transform: scaleY(0);
+  opacity: 0;
+}
+
+.ww-accordion__summary .ww-icon {
+  transition: transform var(--ww-dur-ui) var(--ww-ease);
+}
+
+.ww-accordion[open]:not(.is-closing) .ww-accordion__summary .ww-icon {
+  transform: rotate(180deg);
 }
 
 .ww-accordion__content {

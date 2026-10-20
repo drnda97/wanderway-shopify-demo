@@ -47,12 +47,22 @@ if (!customElements.get('ww-delivery-estimate')) {
             ? WWShipping.formatDate(from, locale)
             : `${WWShipping.formatDate(from, locale)} – ${WWShipping.formatDate(to, locale)}`;
 
-        this.querySelector('[data-ww-arrival]').textContent = arrival;
-        this.querySelector('[data-ww-days]').textContent = (this.dataset.days || '')
-          .replace('[min]', zone.min)
-          .replace('[max]', zone.max);
-        this.querySelector('[data-ww-price]').textContent = zone.price;
-        this.querySelector('[data-ww-carrier]').textContent = zone.carrier;
+        const values = {
+          '[data-ww-arrival]': arrival,
+          '[data-ww-days]': (this.dataset.days || '').replace('[min]', zone.min).replace('[max]', zone.max),
+          '[data-ww-price]': zone.price,
+          '[data-ww-carrier]': zone.carrier,
+        };
+        const changed = [];
+        Object.entries(values).forEach(([selector, text]) => {
+          const el = this.querySelector(selector);
+          if (el.textContent === text) return;
+          el.textContent = text;
+          changed.push(el);
+        });
+        // Animate zone changes, not the first paint or the per-minute refresh.
+        if (this.rendered && changed.length) window.WWMotion?.swapIn(changed, { y: 8, duration: 420, stagger: 60 });
+        this.rendered = true;
       }
 
       /** Re-read the cart total; the progress markup is rendered by Liquid on load. */

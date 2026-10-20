@@ -8,7 +8,7 @@
 
 {%- assign s = section.settings -%}
 <section class="ww-featured ww-section ww-scope page-width" aria-labelledby="WWFeaturedHeading-{{ section.id }}">
-  <div class="ww-featured__header">
+  <div class="ww-featured__header" data-ww-reveal>
     <div class="ww-featured__titles">
       {%- if s.eyebrow != blank -%}
         <p class="ww-eyebrow ww-featured__eyebrow">{{ s.eyebrow | escape }}</p>
@@ -31,7 +31,7 @@
     {%- for block in section.blocks -%}
       {%- assign block_product = block.settings.product | default: all_products[block.settings.product_handle] -%}
       {%- if block_product.id != blank -%}
-        <li {{ block.shopify_attributes }}>
+        <li data-ww-reveal {{ block.shopify_attributes }}>
           {%- render 'ww-card-product',
             card_product: block_product,
             colour: block.settings.colour,

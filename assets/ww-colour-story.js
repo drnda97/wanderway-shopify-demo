@@ -58,6 +58,7 @@ if (!customElements.get('ww-colour-story')) {
         const wanted = String(value || '').trim().toLowerCase();
         const target = this.panels.find((panel) => panel.dataset.colour === wanted);
         if (!target) return;
+        const changing = !target.classList.contains('is-active');
 
         this.panels.forEach((panel) => {
           const active = panel === target;
@@ -69,6 +70,17 @@ if (!customElements.get('ww-colour-story')) {
         this.querySelectorAll('.ww-colour-story__swatch').forEach((swatch) => {
           swatch.setAttribute('aria-pressed', String(swatch.dataset.value.toLowerCase() === wanted));
         });
+
+        if (changing && window.WWMotion && !WWMotion.reduced()) {
+          target
+            .querySelector('.ww-colour-story__img')
+            ?.animate([{ transform: 'scale(1.05)' }, { transform: 'none' }], { duration: 900, easing: WWMotion.EASE });
+          WWMotion.swapIn(target.querySelectorAll('.ww-colour-story__body > :not(.ww-colour-story__swatches)'), {
+            y: 10,
+            duration: 460,
+            stagger: 50,
+          });
+        }
       }
     }
   );

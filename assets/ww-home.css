@@ -190,6 +190,12 @@
 .ww-editorial__img {
   display: block;
   object-fit: cover;
+  transition: transform 1.4s var(--ww-ease);
+}
+
+.ww-editorial__card:hover .ww-editorial__img,
+.ww-newsletter__card:hover .ww-newsletter__img {
+  transform: scale(1.03);
 }
 
 .ww-editorial__overlay {
@@ -329,6 +335,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 1.4s var(--ww-ease);
 }
 
 .ww-newsletter__body {

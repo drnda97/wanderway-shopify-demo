@@ -9,7 +9,7 @@
   assign form_id = 'WWNewsletter-' | append: section.id
 -%}
 <section class="ww-newsletter ww-section ww-scope page-width" aria-labelledby="WWNewsletterHeading-{{ section.id }}">
-  <div class="ww-newsletter__card">
+  <div class="ww-newsletter__card" data-ww-reveal>
     <div class="ww-newsletter__media">
       {%- render 'ww-image',
         image: s.image,

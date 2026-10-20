@@ -10,6 +10,8 @@
  *     frozen as an overlay; on variantChange (after Dawn swapped the media)
  *     the overlay fades out over the new, decoded photo, which settles from a
  *     slight zoom. The buy-box values that changed slide in, staggered.
+ *     Thumbnail clicks use the same photo transition.
+ *   - accordions open and close with a height + fade transition
  *
  * <ww-sticky-atc data-section>
  *   Mobile bar that appears once the main Add to cart button has scrolled
@@ -44,6 +46,9 @@
           if (mobile.matches) {
             this.root.querySelectorAll('.ww-accordion[data-desktop-open]').forEach((details) => (details.open = false));
           }
+          this.root.querySelectorAll('.ww-accordion__summary').forEach((summary) =>
+            summary.addEventListener('click', (event) => this.toggleAccordion(event, summary.parentElement))
+          );
 
           this.unsubscribe = onVariantChange(this.sectionId, (variant) => {
             this.available = Boolean(variant?.available);
@@ -66,6 +71,35 @@
           this.unsubscribe?.();
           this.unsubscribeSelection?.();
           this.galleryObserver?.disconnect();
+        }
+
+        /* ---- Accordions ---- */
+        toggleAccordion(event, details) {
+          const content = details.querySelector('.ww-accordion__content');
+          if (!content || reducedMotion.matches) return; // native toggle
+          event.preventDefault();
+          details.accordionAnimation?.cancel();
+          const opening = !details.open;
+          const margin = parseFloat(getComputedStyle(content).marginBottom) || 0;
+          if (opening) details.open = true;
+          details.classList.toggle('is-closing', !opening);
+          const height = content.offsetHeight + margin;
+          const frames = [
+            { height: '0px', opacity: 0, marginBottom: '0px' },
+            { height: `${height - margin}px`, opacity: 1, marginBottom: `${margin}px` },
+          ];
+          content.style.overflow = 'hidden';
+          const animation = content.animate(opening ? frames : frames.slice().reverse(), {
+            duration: opening ? 380 : 300,
+            easing: EASE,
+          });
+          details.accordionAnimation = animation;
+          animation.onfinish = () => {
+            content.style.overflow = '';
+            if (!opening) details.open = false;
+            details.classList.remove('is-closing');
+            details.accordionAnimation = null;
+          };
         }
 
         /* ---- Colour change transition ---- */
@@ -183,8 +217,12 @@
           this.priceLabel = document.createElement('span');
           this.priceLabel.className = 'ww-atc-price';
           this.button.querySelector(':scope > span')?.after(this.priceLabel);
-          this.quantity?.addEventListener('change', () => this.renderAddToCartPrice());
-          this.quantity?.addEventListener('input', () => this.renderAddToCartPrice());
+          const onQuantity = () => {
+            this.renderAddToCartPrice();
+            window.WWMotion?.swapIn(this.priceLabel, { y: 4, duration: 300 });
+          };
+          this.quantity?.addEventListener('change', onQuantity);
+          this.quantity?.addEventListener('input', onQuantity);
           this.renderAddToCartPrice();
         }
 
@@ -215,7 +253,19 @@
             this.page = event.detail?.currentPage || 1;
             this.renderGallery();
           });
-          this.galleryObserver = new MutationObserver(() => this.renderGallery());
+          // Thumbnail click: freeze the current photo; Dawn then switches the active media.
+          this.root.addEventListener(
+            'click',
+            (event) => {
+              const thumb = event.target.closest('.thumbnail');
+              if (thumb && !thumb.hasAttribute('aria-current')) this.freezeGallery();
+            },
+            true
+          );
+          this.galleryObserver = new MutationObserver(() => {
+            this.renderGallery();
+            if (this.ghost) this.revealGallery();
+          });
           this.galleryObserver.observe(this.viewer.querySelector('.product__media-list'), {
             attributes: true,
             attributeFilter: ['class'],
@@ -248,9 +298,17 @@
           const active = this.viewer.querySelector('.product__media-item.is-active') || media[index];
           const img = (mobile.matches ? media[index] : active)?.querySelector('img');
           const label = (img?.alt || '').split(' – ').pop();
-          this.overlay.querySelector('.ww-gallery__label').textContent = label;
-          this.overlay.querySelector('.ww-gallery__label').hidden = !label;
-          this.overlay.querySelector('.ww-gallery__count').textContent = `${index + 1} / ${count}`;
+          const labelEl = this.overlay.querySelector('.ww-gallery__label');
+          const countEl = this.overlay.querySelector('.ww-gallery__count');
+          const countText = `${index + 1} / ${count}`;
+          const changed = [];
+          if (labelEl.textContent !== label) changed.push(labelEl);
+          if (countEl.textContent !== countText) changed.push(countEl);
+          labelEl.textContent = label;
+          labelEl.hidden = !label;
+          countEl.textContent = countText;
+          if (this.galleryReady) window.WWMotion?.swapIn(changed, { y: 4, duration: 320 });
+          this.galleryReady = true;
           this.overlay.querySelector('.ww-gallery__dots').replaceChildren(
             ...Array.from({ length: count }, (_, i) => {
               const dot = document.createElement('span');

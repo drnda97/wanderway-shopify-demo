@@ -6,7 +6,7 @@
 
 {%- assign s = section.settings -%}
 <section class="ww-editorial ww-section ww-scope page-width" aria-labelledby="WWEditorialHeading-{{ section.id }}">
-  <div class="ww-editorial__card">
+  <div class="ww-editorial__card" data-ww-reveal>
     {%- render 'ww-image',
       image: s.image,
       fallback: 'lifestyle-platform.jpg',

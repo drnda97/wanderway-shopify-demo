@@ -13,7 +13,7 @@
   assign rendered = 0
 -%}
 <section class="ww-related ww-section ww-scope page-width{% if s.hide_on_mobile %} ww-related--desktop{% endif %}" aria-labelledby="WWRelatedHeading-{{ section.id }}">
-  <h2 id="WWRelatedHeading-{{ section.id }}" class="ww-h3 ww-related__heading">
+  <h2 id="WWRelatedHeading-{{ section.id }}" class="ww-h3 ww-related__heading" data-ww-reveal>
     {{- s.heading | escape }}
     {% if s.heading_italic != blank %}<em>{{ s.heading_italic | escape }}</em>{% endif -%}
   </h2>
@@ -21,14 +21,14 @@
     {%- if picks != blank and picks.count > 0 -%}
       {%- for pick in picks -%}
         {%- if pick.id == product.id or rendered >= s.limit -%}{%- continue -%}{%- endif -%}
-        <li>{%- render 'ww-card-product', card_product: pick, simple: true, sizes: '(min-width: 990px) 304px, 50vw' -%}</li>
+        <li data-ww-reveal>{%- render 'ww-card-product', card_product: pick, simple: true, sizes: '(min-width: 990px) 304px, 50vw' -%}</li>
         {%- assign rendered = rendered | plus: 1 -%}
       {%- endfor -%}
     {%- else -%}
       {%- for handle in handles -%}
         {%- assign pick = all_products[handle] -%}
         {%- if pick.id == blank or pick.id == product.id or rendered >= s.limit -%}{%- continue -%}{%- endif -%}
-        <li>{%- render 'ww-card-product', card_product: pick, simple: true, sizes: '(min-width: 990px) 304px, 50vw' -%}</li>
+        <li data-ww-reveal>{%- render 'ww-card-product', card_product: pick, simple: true, sizes: '(min-width: 990px) 304px, 50vw' -%}</li>
         {%- assign rendered = rendered | plus: 1 -%}
       {%- endfor -%}
     {%- endif -%}
