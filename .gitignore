@@ -10,3 +10,5 @@ Thumbs.db
 .shopify
 node_modules
 *.zip
+# Design handoff package (kept locally, not part of the theme)
+wanderway-demo-handoff/
